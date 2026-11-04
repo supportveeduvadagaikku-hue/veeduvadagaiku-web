@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="/logo-emblem.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Veedu Vadagaikku" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Find houses and shops for rent in Chennai. veeduvadagaikkuchennai - Chennai's most trusted rental marketplace." />
     <meta name="keywords" content="veeduvadagaikkuchennai, house for rent Chennai, shop for rent Chennai, rental property Chennai, வீடு வாடகைக்கு சென்னை" />
     <meta property="og:title" content="veeduvadagaikkuchennai - Rental Marketplace" />
@@ -15,10 +15,13 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="veeduvadagaikkuchennai" />
     <meta name="theme-color" content="#0B2545" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="preload" href="/logo-emblem.png" as="image" type="image/png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'" />
     <title>Veedu Vadagaikku Chennai | Rental Marketplace</title>
   </head>
   <body>
@@ -27,9 +30,11 @@
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;">
         <img
           id="preloader-logo"
-          src="/logo.png"
+          src="/logo-emblem.png"
           alt="veeduvadagaikkuchennai"
-          style="width:280px;max-width:85vw;height:auto;object-fit:contain;border-radius:20px;box-shadow:0 12px 30px -6px rgba(0,0,0,0.2);animation:preloaderPulse 1.8s ease-in-out infinite;"
+          width="160"
+          height="160"
+          style="width:160px;max-width:50vw;height:auto;object-fit:contain;border-radius:24px;box-shadow:0 12px 30px -6px rgba(0,0,0,0.15);animation:preloaderPulse 1.4s ease-in-out infinite;"
         />
       </div>
     </div>

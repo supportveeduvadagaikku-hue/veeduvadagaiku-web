@@ -30,12 +30,18 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          firebase: ['firebase/app', 'firebase/auth'],
-          query: ['@tanstack/react-query'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('firebase')) return 'firebase';
+            if (id.includes('lucide-react')) return 'icons';
+            if (id.includes('@tanstack/react-query') || id.includes('axios')) return 'data-client';
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor';
+          }
         },
       },
     },

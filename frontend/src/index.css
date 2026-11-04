@@ -8,22 +8,35 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100vw;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-[#FAFAF8] text-slate-800 font-sans antialiased selection:bg-[#C5A059] selection:text-white font-normal;
     letter-spacing: 0.005em;
+    overflow-x: hidden;
+    max-width: 100vw;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
   }
 
   h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.005em;
   }
+
+  /* Improve touch targets and inputs on mobile */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
 }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
