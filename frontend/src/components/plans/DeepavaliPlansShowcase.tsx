@@ -164,14 +164,14 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
   return (
     <div id="listing-plans" className="w-full bg-[#FAF6EF] text-[#240a15] font-sans scroll-mt-20">
       {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#1b0610] via-[#240a15] to-[#2d0c1b] text-white pt-8 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 border-b border-[#3d1323]">
+      <section className="relative overflow-hidden w-full max-w-full bg-gradient-to-b from-[#1b0610] via-[#240a15] to-[#2d0c1b] text-white pt-6 sm:pt-8 pb-12 sm:pb-24 px-4 sm:px-6 lg:px-8 border-b border-[#3d1323]">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/3 right-10 w-80 h-80 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-6xl mx-auto space-y-10 sm:space-y-12 relative z-10">
+        <div className="max-w-6xl mx-auto space-y-8 sm:space-y-12 relative z-10 w-full">
           {!hideHeroBrandBar && (
-            <div className="flex items-center justify-between border-b border-[#3f1525]/60 pb-5">
+            <div className="flex items-center justify-between border-b border-[#3f1525]/60 pb-4 sm:pb-5">
               <Link to="/" className="inline-block group">
-                <span className="text-[#f59e0b] font-black text-xl sm:text-2xl tracking-tight leading-none">
+                <span className="text-[#f59e0b] font-black text-lg sm:text-2xl tracking-tight leading-none">
                   veeduvadagaikku chennai
                 </span>
                 <span className="block text-[#edd8de] text-xs sm:text-sm font-normal mt-0.5">
@@ -180,62 +180,75 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
               </Link>
               <Link
                 to="/owner/properties/add"
-                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b] hover:text-[#1b0610] text-xs sm:text-sm font-bold transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b] hover:text-[#1b0610] text-xs sm:text-sm font-bold transition-all"
               >
                 List your property
               </Link>
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#391121] border border-[#5a1b34] text-[#fcd34d] text-xs sm:text-[13px] font-semibold">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start">
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 w-full">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#391121] border border-[#5a1b34] text-[#fcd34d] text-xs sm:text-[13px] font-semibold">
                 <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />
                 <span>For owners & advertisers only</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black text-white leading-[1.12] tracking-tight">
+              <h1 className="text-2xl sm:text-4xl lg:text-[50px] font-black text-white leading-[1.15] tracking-tight break-words">
                 List your property &amp; services{" "}
                 <span className="text-[#f59e0b] underline decoration-[#f59e0b]/50 decoration-wavy decoration-2">
                   free
                 </span>{" "}
                 till Deepavali
               </h1>
-              <div className="space-y-1.5">
-                <p className="text-base sm:text-xl font-bold text-[#fcd34d] leading-relaxed">
+              <div className="space-y-1.5 break-words">
+                <p className="text-sm sm:text-lg lg:text-xl font-bold text-[#fcd34d] leading-relaxed">
                   தீபாவளி வரை உங்கள் வீடு, கடை, மண்டபம் அனைத்தையும் கட்டணமின்றி பதிவு செய்யுங்கள்!
                 </p>
-                <p className="text-sm sm:text-lg font-medium text-[#edd8de] leading-relaxed">
+                <p className="text-xs sm:text-base lg:text-lg font-medium text-[#edd8de] leading-relaxed">
                   இந்த தீபாவளிக்கு உங்கள் சொத்து சென்னை முழுவதும் தெரியட்டும் – பதிவு முற்றிலும் இலவசம்!
                 </p>
               </div>
-              <p className="text-sm sm:text-base text-[#d4bac6] max-w-xl font-normal leading-relaxed">
+              <p className="text-xs sm:text-base text-[#d4bac6] max-w-xl font-normal leading-relaxed">
                 Put your house, shop, hall or home service in front of Chennai across every pincode. No listing fee on anything posted on or before Deepavali.
               </p>
-              <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <Link
                   to="/owner/properties/add"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#f59e0b] hover:bg-[#eab308] text-[#1b0610] text-sm sm:text-base font-black shadow-xl shadow-amber-500/25 transition-all active:scale-95 group"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#f59e0b] hover:bg-[#eab308] text-[#1b0610] text-sm sm:text-base font-black shadow-xl shadow-amber-500/25 transition-all active:scale-95 group text-center"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 shrink-0" />
                   <span>Post your property for free</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-[#edd8de] font-semibold">
                   <Clock className="w-4 h-4 text-[#f59e0b] shrink-0" />
                   <span>Offer ends Deepavali, 8 Nov 2026</span>
                 </div>
               </div>
-              <div className="pt-2">
-                <div className="inline-flex items-center gap-3 p-2.5 px-4 rounded-2xl bg-[#320e1e]/90 border border-[#52192f] text-xs">
-                  <span className="text-[#fcd34d] font-bold uppercase tracking-wider flex items-center gap-1.5">
+
+              {/* Wanted Column Button directly below Deepavali button */}
+              <div className="pt-0.5">
+                <Link
+                  to="/wanted-spaces/specify"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/40 border border-emerald-400/30 transition-all active:scale-95 group text-center"
+                >
+                  <Megaphone className="w-4 h-4 text-emerald-200 shrink-0" />
+                  <span>Wanted Column (தேவை பகுதி - Post Requirement)</span>
+                  <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              <div className="pt-2 w-full max-w-full overflow-hidden">
+                <div className="inline-flex flex-wrap items-center gap-2 sm:gap-3 p-2.5 px-3 sm:px-4 rounded-2xl bg-[#320e1e]/90 border border-[#52192f] text-xs max-w-full">
+                  <span className="text-[#fcd34d] font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px] sm:text-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
                     Deepavali Countdown:
                   </span>
-                  <div className="flex items-center gap-2 text-white font-mono font-black">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-white font-mono font-black text-xs sm:text-sm">
                     {[{ v: timeLeft.days, u: "d" }, { v: timeLeft.hours, u: "h" }, { v: timeLeft.minutes, u: "m" }, { v: timeLeft.seconds, u: "s" }].map((t, i) => (
                       <React.Fragment key={i}>
                         {i > 0 && <span className="text-[#f59e0b]">:</span>}
-                        <span className="px-2 py-0.5 bg-[#441329] rounded-md text-[#f59e0b]">
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-[#441329] rounded-md text-[#f59e0b]">
                           {String(t.v).padStart(2, "0")}{t.u}
                         </span>
                       </React.Fragment>
@@ -244,8 +257,9 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
                 </div>
               </div>
             </div>
-            <div className="lg:col-span-5">
-              <div className="bg-white text-gray-900 rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-amber-300/40 relative overflow-hidden hover:scale-[1.01] transition-transform">
+
+            <div className="lg:col-span-5 w-full">
+              <div className="bg-white text-gray-900 rounded-3xl p-5 sm:p-8 shadow-2xl border-2 border-amber-300/40 relative overflow-hidden hover:scale-[1.01] transition-transform w-full">
                 <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-400 to-amber-500 text-[#1b0610] text-[10px] font-black uppercase tracking-widest py-1 px-4 rounded-bl-xl">
                   100% Free
                 </div>
@@ -260,15 +274,19 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
                   <div className="pt-3 border-t border-gray-100 space-y-2.5">
                     {["Valid in all 150+ Chennai pincodes", "Full 60-day validity at zero extra cost", "Direct phone calls & WhatsApp tenant leads"].map((f) => (
                       <div key={f} className="flex items-center gap-2 text-xs text-gray-700 font-medium">
-                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-[10px] font-black">V</span>
+                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-[10px] font-black">✓</span>
                         <span>{f}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-2">
                     <Link to="/owner/properties/add" className="w-full py-3 px-4 rounded-full bg-[#240a15] hover:bg-[#320e1e] text-[#f59e0b] font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md">
                       <span>Post your property for free</span>
                       <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link to="/wanted-spaces/specify" className="w-full py-2.5 px-4 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                      <Megaphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Wanted Column (Specify Requirement)</span>
                     </Link>
                   </div>
                 </div>
