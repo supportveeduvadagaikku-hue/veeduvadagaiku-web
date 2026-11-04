@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
+import { ConfirmationResult, linkWithPhoneNumber, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { authService } from '../../services/auth.service';
 import { useAuth } from '../../hooks/useAuth';
@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 interface PhoneOTPFormProps {
   role?: 'USER' | 'OWNER';
+  mode?: 'sign-in' | 'link-phone';
   containerId?: string;
   onSuccess?: () => void;
 }
@@ -34,6 +35,9 @@ function getFriendlyFirebaseError(err: any): string {
   if (code.includes('invalid-verification-code')) {
     return 'Incorrect 6-digit OTP. Please check and re-enter.';
   }
+  if (code.includes('credential-already-in-use')) {
+    return 'This phone number is already linked to another account. Sign in to that account or use a different number.';
+  }
   if (code.includes('code-expired')) {
     return 'OTP has expired. Please request a new OTP.';
   }
@@ -42,6 +46,7 @@ function getFriendlyFirebaseError(err: any): string {
 
 export const PhoneOTPForm: React.FC<PhoneOTPFormProps> = ({
   role = 'USER',
+  mode = 'sign-in',
   containerId = 'recaptcha-container',
   onSuccess,
 }) => {
@@ -134,7 +139,15 @@ export const PhoneOTPForm: React.FC<PhoneOTPFormProps> = ({
         return;
       }
 
-      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, verifier);
+      const confirmation = mode === 'link-phone'
+        ? auth.currentUser
+          ? await linkWithPhoneNumber(auth.currentUser, formattedPhone, verifier)
+          : null
+        : await signInWithPhoneNumber(auth, formattedPhone, verifier);
+      if (!confirmation) {
+        toast.error('Your sign-in session has expired. Please sign in again before verifying your phone.');
+        return;
+      }
       setConfirmationResult(confirmation);
       setStep('OTP');
       setCountdown(60);

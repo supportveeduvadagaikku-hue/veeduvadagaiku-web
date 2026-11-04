@@ -34,7 +34,7 @@ import toast from 'react-hot-toast';
 
 export const PropertyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: propRes, isLoading, error } = useProperty(id || '');
+  const { data: propRes, isLoading, error, refetch } = useProperty(id || '');
   const property = propRes?.data;
 
   const { isFavourite, toggleFavourite, isPending: favPending } = useFavourites();
@@ -135,6 +135,12 @@ export const PropertyDetailPage: React.FC = () => {
     /[\u0B80-\u0BFF]/.test(property.description || '');
 
   const isUserLoggedInWithMobile = Boolean(user && user.mobile);
+  const visibleAmenities = (property.amenities || []).filter(
+    (amenity) => !/^\[(?:LANG|CATEGORY|IMG_PRIMARY|IMG_EXTRA):/i.test(amenity)
+  );
+  const displayDescription = (property.description || '')
+    .replace(/\s*\[(?:LANG|CATEGORY):[^\]]+\]/gi, '')
+    .trim();
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-5 sm:space-y-8">
@@ -318,26 +324,24 @@ export const PropertyDetailPage: React.FC = () => {
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-3">
             <h3 className="text-lg font-black text-gray-900">{t('detail.about')}</h3>
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">
-              {property.description}
+              {displayDescription}
             </p>
           </div>
 
           {/* Amenities & Features */}
-          {property.amenities && property.amenities.length > 0 && (
+          {visibleAmenities.length > 0 && (
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
               <h3 className="text-lg font-black text-gray-900">{t('detail.amenities')}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {property.amenities
-                  .filter((a) => !a.startsWith('[LANG:'))
-                  .map((amenity, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl text-xs font-semibold text-gray-800"
-                    >
-                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>{amenity}</span>
-                    </div>
-                  ))}
+                {visibleAmenities.map((amenity, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl text-xs font-semibold text-gray-800"
+                  >
+                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span>{amenity}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -555,6 +559,9 @@ export const PropertyDetailPage: React.FC = () => {
       <PhoneLoginModal
         isOpen={showPhoneLoginModal}
         onClose={() => setShowPhoneLoginModal(false)}
+        onSuccess={() => {
+          void refetch();
+        }}
       />
     </div>
   );

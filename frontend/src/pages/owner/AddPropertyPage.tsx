@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { propertyService } from '../../services/property.service';
 import { useLocalities } from '../../hooks/useProperties';
 import { ImageUploader } from '../../components/property/ImageUploader';
+import { PhoneOTPForm } from '../../components/auth/PhoneOTPForm';
+import { useAuth } from '../../hooks/useAuth';
 import { compressImageToBase64 } from '../../utils/imageCompression';
 import { SEOHead } from '../../components/common/SEOHead';
 import {
@@ -38,6 +40,8 @@ import { getNavaratriOffer, isOfferActive } from '../../config/offersConfig';
 export const AddPropertyPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const hasVerifiedMobile = Boolean(user?.mobile);
   const { data: localitiesData } = useLocalities();
   const localities = (Array.isArray(localitiesData) && localitiesData.length > 0) ? localitiesData : CHENNAI_LOCALITIES;
 
@@ -302,6 +306,11 @@ export const AddPropertyPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!hasVerifiedMobile) {
+      toast.error('Verify your mobile number with OTP before posting a property.');
+      return;
+    }
+
     if (!locality) {
       toast.error('Please select a Chennai locality or detect your current location');
       return;
@@ -491,6 +500,23 @@ export const AddPropertyPage: React.FC = () => {
             Save ₹222+
           </span>
         </div>
+      )}
+
+      {!hasVerifiedMobile && (
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-amber-200 shadow-sm space-y-4">
+          <div>
+            <h2 className="text-lg font-black text-gray-900">Verify your mobile number to post</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              We’ll send a one-time password by SMS. Your verified number will be used as the owner contact for your listing.
+            </p>
+          </div>
+          <PhoneOTPForm
+            role="OWNER"
+            mode="link-phone"
+            containerId="owner-property-phone-recaptcha"
+            onSuccess={() => toast.success('Phone verified. You can now post your property.')}
+          />
+        </section>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -1353,10 +1379,10 @@ export const AddPropertyPage: React.FC = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !hasVerifiedMobile}
             className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B8860B] hover:brightness-105 text-white font-bold text-sm rounded-xl shadow-lg shadow-[#D4AF37]/25 transition active:scale-95 disabled:opacity-50 whitespace-nowrap flex items-center justify-center gap-2"
           >
-            <span>{isSubmitting ? 'Uploading Photos...' : 'Save & Select Plan'}</span>
+            <span>{isSubmitting ? 'Uploading Photos...' : hasVerifiedMobile ? 'Save & Select Plan' : 'Verify phone to continue'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
