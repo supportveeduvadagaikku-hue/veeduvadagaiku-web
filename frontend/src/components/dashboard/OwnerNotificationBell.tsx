@@ -32,9 +32,26 @@ export const OwnerNotificationBell: React.FC = () => {
     let disposed = false;
     listenForPushMessages((payload) => {
       queryClient.invalidateQueries({ queryKey: ['ownerNotifications'] });
-      const title = payload.data?.title;
-      const body = payload.data?.body;
-      toast(`${title ? `${title}: ` : ''}${body || 'Someone viewed one of your properties.'}`, {
+      const title = payload.notification?.title || payload.data?.title || 'Veedu Vadagaikku Alert';
+      const body = payload.notification?.body || payload.data?.body || 'New property update.';
+
+      // Show actual native OS mobile/system notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          navigator.serviceWorker.ready.then((reg) => {
+            reg.showNotification(title, {
+              body,
+              icon: '/favicon.ico',
+              badge: '/favicon.ico',
+              data: { url: payload.data?.url || '/owner/properties' },
+            } as any);
+          }).catch(() => {
+            new Notification(title, { body, icon: '/favicon.ico' });
+          });
+        } catch {}
+      }
+
+      toast(`${title}: ${body}`, {
         duration: 5000,
       });
     }).then((stop) => {

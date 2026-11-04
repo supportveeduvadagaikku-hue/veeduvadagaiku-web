@@ -10,6 +10,7 @@ interface PropertyRef {
 
 /**
  * Sends an in-app alert and Web Push notification (FCM) to a property owner.
+ * Triggers native OS system notifications on mobile & desktop (with sound, vibration, and lock screen tray icon).
  */
 export async function sendOwnerPushNotification({
   ownerId,
@@ -51,9 +52,15 @@ export async function sendOwnerPushNotification({
   });
   if (subscriptions.length === 0) return;
 
+  const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${href}`;
+
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
       tokens: subscriptions.map(({ token }) => token),
+      notification: {
+        title,
+        body,
+      },
       data: {
         title,
         body,
@@ -61,8 +68,31 @@ export async function sendOwnerPushNotification({
         notificationId: notification?.id || '',
       },
       webpush: {
+        headers: {
+          Urgency: 'high',
+        },
+        notification: {
+          title,
+          body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          requireInteraction: true,
+          vibrate: [200, 100, 200],
+          tag: notification?.id || 'veedu-alert',
+          renotify: true,
+        },
         fcmOptions: {
-          link: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${href}`,
+          link: targetLink,
+        },
+      },
+      android: {
+        priority: 'high',
+        notification: {
+          title,
+          body,
+          sound: 'default',
+          priority: 'max',
+          channelId: 'default',
         },
       },
     });
@@ -159,9 +189,15 @@ export async function notifyPropertyView(
   });
   if (subscriptions.length === 0) return;
 
+  const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/owner/properties`;
+
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
       tokens: subscriptions.map(({ token }) => token),
+      notification: {
+        title: notification.title,
+        body: notification.body,
+      },
       data: {
         title: notification.title,
         body: notification.body,
@@ -169,7 +205,32 @@ export async function notifyPropertyView(
         notificationId: notification.id,
       },
       webpush: {
-        fcmOptions: { link: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${notification.href}` },
+        headers: {
+          Urgency: 'high',
+        },
+        notification: {
+          title: notification.title,
+          body: notification.body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          requireInteraction: true,
+          vibrate: [200, 100, 200],
+          tag: notification.id,
+          renotify: true,
+        },
+        fcmOptions: {
+          link: targetLink,
+        },
+      },
+      android: {
+        priority: 'high',
+        notification: {
+          title: notification.title,
+          body: notification.body,
+          sound: 'default',
+          priority: 'max',
+          channelId: 'default',
+        },
       },
     });
 
