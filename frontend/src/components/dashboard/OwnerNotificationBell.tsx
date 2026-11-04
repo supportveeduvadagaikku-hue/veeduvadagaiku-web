@@ -98,14 +98,38 @@ export const OwnerNotificationBell: React.FC = () => {
   };
 
   return (
-    <div className="relative flex justify-end">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:border-orange-300"
-        aria-label={`Notifications${notificationData?.unreadCount ? `, ${notificationData.unreadCount} unread` : ''}`}
-        aria-expanded={open}
-      >
+    <div className="space-y-3">
+      {!pushEnabled && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-orange-300 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-600 text-white shadow-md shadow-orange-500/20">
+              <BellRing className="h-5 w-5 animate-pulse" />
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-gray-900">Enable Mobile Notifications</h4>
+              <p className="text-xs text-gray-600">Get real phone alerts with sound & vibration when your property is approved.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleEnablePush}
+            disabled={enablingPush}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-orange-700 active:scale-95 transition-all"
+          >
+            {enablingPush ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+            <span>{enablingPush ? 'Connecting...' : 'Tap to Allow Alerts'}</span>
+          </button>
+        </div>
+      )}
+
+      <div className="relative flex justify-end">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="relative inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:border-orange-300"
+          aria-label={`Notifications${notificationData?.unreadCount ? `, ${notificationData.unreadCount} unread` : ''}`}
+          aria-expanded={open}
+        >
         {notificationData?.unreadCount ? <BellRing className="h-4 w-4 text-orange-600" /> : <Bell className="h-4 w-4" />}
         <span>Notifications</span>
         {!!notificationData?.unreadCount && (
@@ -169,5 +193,6 @@ export const OwnerNotificationBell: React.FC = () => {
         </div>
       )}
     </div>
-  );
+  </div>
+);
 };
