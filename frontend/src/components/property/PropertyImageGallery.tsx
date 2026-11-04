@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { PropertyImage } from '../../types';
-import { ChevronLeft, ChevronRight, Image as ImageIcon, Building2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Building2 } from 'lucide-react';
 import { getImageUrl } from '../../utils/imageUrl';
 
 interface PropertyImageGalleryProps {
@@ -19,6 +20,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
   amenities = [],
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // 1. Gather any Base64 images from amenities
   const amenityImages: PropertyImage[] = (amenities || [])
@@ -40,6 +42,37 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
   );
   const validImages = uploadedImages.length > 0 ? uploadedImages : amenityImages;
 
+  const handlePrev = () => {
+    setSelectedIndex((prev) => (prev === 0 ? validImages.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setSelectedIndex((prev) => (prev === validImages.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsLightboxOpen(false);
+      if (event.key === 'ArrowLeft' && validImages.length > 1) {
+        setSelectedIndex((current) => (current === 0 ? validImages.length - 1 : current - 1));
+      }
+      if (event.key === 'ArrowRight' && validImages.length > 1) {
+        setSelectedIndex((current) => (current === validImages.length - 1 ? 0 : current + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isLightboxOpen, validImages.length]);
+
   if (validImages.length === 0) {
     return (
       <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden bg-gradient-to-br from-[#FAF7F0] to-[#EFE8D8] border border-[#E8DFC8] flex flex-col items-center justify-center text-gray-400 p-6 text-center">
@@ -49,14 +82,6 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
       </div>
     );
   }
-
-  const handlePrev = () => {
-    setSelectedIndex((prev) => (prev === 0 ? validImages.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setSelectedIndex((prev) => (prev === validImages.length - 1 ? 0 : prev + 1));
-  };
 
   const activeUrl = getImageUrl(validImages[selectedIndex]?.imageUrl);
 
@@ -73,15 +98,22 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
             className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none select-none"
           />
         )}
-        <img
-          src={activeUrl}
-          alt={`${title} - Photo ${selectedIndex + 1}`}
-          className="relative z-10 w-full h-full object-contain p-2 max-h-[560px] transition-all duration-300"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-          }}
-        />
+        <button
+          type="button"
+          onClick={() => setIsLightboxOpen(true)}
+          aria-label={`View photo ${selectedIndex + 1} full screen`}
+          className="relative z-10 w-full h-full flex items-center justify-center cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          <img
+            src={activeUrl}
+            alt={`${title} - Photo ${selectedIndex + 1}`}
+            className="w-full h-full object-contain p-2 max-h-[560px] transition-all duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
+        </button>
 
         {/* Counter Badge */}
         <div className="absolute bottom-4 right-4 z-20 px-3 py-1 bg-black/70 backdrop-blur-md text-white text-xs font-semibold rounded-full">
@@ -139,6 +171,61 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
             );
           })}
         </div>
+      )}
+
+      {isLightboxOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-3 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${title} photo viewer`}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsLightboxOpen(false)}
+            aria-label="Close full-screen image"
+            className="absolute right-4 top-4 z-20 rounded-full bg-white/15 p-3 text-white transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          <div className="relative flex h-full w-full max-w-7xl items-center justify-center" onClick={(event) => event.stopPropagation()}>
+            {validImages.length > 1 && (
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Previous image"
+                className="absolute left-1 sm:left-4 z-20 rounded-full bg-white/15 p-3 text-white transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <ChevronLeft className="h-7 w-7" />
+              </button>
+            )}
+
+            <img
+              src={activeUrl}
+              alt={`${title} - Photo ${selectedIndex + 1}`}
+              className="max-h-[calc(100vh-7rem)] max-w-full select-none object-contain"
+              draggable={false}
+            />
+
+            {validImages.length > 1 && (
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Next image"
+                className="absolute right-1 sm:right-4 z-20 rounded-full bg-white/15 p-3 text-white transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <ChevronRight className="h-7 w-7" />
+              </button>
+            )}
+          </div>
+
+          <div className="absolute bottom-4 rounded-full bg-black/60 px-3 py-1 text-sm font-medium text-white">
+            {selectedIndex + 1} / {validImages.length}
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );
