@@ -236,28 +236,28 @@ export const HomePage: React.FC = () => {
           <div className="max-w-4xl mx-auto px-2">
             <Link
               to="/plans"
-              className="group flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#1b0610] via-[#240a15] to-[#2d0c1b] text-white border border-[#f59e0b]/40 shadow-lg shadow-amber-950/20 hover:brightness-105 transition active:scale-[0.99]"
+              className="group flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#F7EEDC] via-[#E8D6B8] to-[#D8BC97] text-[#4C3612] border border-[#C5A059]/40 shadow-lg shadow-amber-900/15 hover:brightness-[0.98] transition active:scale-[0.99]"
             >
               <div className="flex items-center gap-3 text-center sm:text-left">
-                <div className="w-10 h-10 rounded-xl bg-[#391121] border border-[#5a1b34] flex items-center justify-center shrink-0">
-                  <Sparkles className="w-5 h-5 text-[#f59e0b]" />
+                <div className="w-10 h-10 rounded-xl bg-[#E8D6B8] border border-[#D8BC97] flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-[#8F6E2D]" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-                    <span className="text-xs sm:text-sm font-black text-white">
-                      Deepavali Special Offer: List Properties &amp; Services <span className="text-[#f59e0b]">FREE</span>
+                    <span className="text-xs sm:text-sm font-black text-[#4C3612]">
+                      Deepavali Special Offer: List Properties &amp; Services <span className="text-[#8F6E2D]">FREE</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-[#f59e0b] text-[#1b0610] text-[10px] font-black uppercase">
+                    <span className="px-2 py-0.5 rounded-full bg-[#8F6E2D] text-white text-[10px] font-black uppercase">
                       Till 8 Nov
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-[#edd8de] mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-[#6F5320] mt-0.5">
                     தீபாவளி வரை உங்கள் சொத்தை இலவசமாக பதிவு செய்யுங்கள் • Zero Listing Fee
                   </p>
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#f59e0b] text-[#1b0610] text-xs font-black tracking-wide shrink-0 shadow-sm group-hover:bg-[#eab308] transition">
+              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#8F6E2D] text-white text-xs font-black tracking-wide shrink-0 shadow-sm group-hover:bg-[#6F5320] transition">
                 <span>View Plans &amp; Pricing</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
