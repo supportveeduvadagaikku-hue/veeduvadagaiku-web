@@ -91,6 +91,8 @@ model Owner {
   properties Property[]
   payments   Payment[]
   enquiries  Enquiry[]  @relation("OwnerEnquiries")
+  notifications OwnerNotification[]
+  pushTokens NotificationPushToken[]
 }
 
 model Property {
@@ -130,6 +132,7 @@ model Property {
   payments   Payment[]
   enquiries  Enquiry[]
   favourites Favourite[]
+  notifications OwnerNotification[]
 
   @@index([status, expiresAt])
   @@index([expiresAt])
@@ -211,6 +214,35 @@ model Favourite {
   createdAt  DateTime @default(now())
 
   @@unique([userId, propertyId])
+}
+
+model OwnerNotification {
+  id         String   @id @default(cuid())
+  ownerId    String
+  owner      Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  title      String
+  body       String
+  href       String
+  visitorKey String
+  visitDate  DateTime @db.Date
+  createdAt  DateTime @default(now())
+  readAt     DateTime?
+
+  @@unique([propertyId, visitorKey, visitDate])
+  @@index([ownerId, createdAt])
+}
+
+model NotificationPushToken {
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
 }
 
 // ─── Wanted Spaces ────────────────────────────────────────────────────────────

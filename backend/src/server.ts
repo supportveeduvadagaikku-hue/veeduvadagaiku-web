@@ -5,6 +5,7 @@ import app from './app';
 import { prisma } from './config/database';
 import { initFirebase } from './config/firebase';
 import { startExpiryScheduler } from './services/validity.service';
+import { ensureOwnerNotificationTables } from './services/ownerNotification.service';
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
@@ -14,6 +15,8 @@ async function startServer() {
     try {
       await prisma.$connect();
       console.log('[Database] Connected successfully');
+      await ensureOwnerNotificationTables();
+      console.log('[Database] Owner notification tables are ready');
       // Initialize automatic property validity & expiry scheduler
       startExpiryScheduler();
     } catch (dbError) {

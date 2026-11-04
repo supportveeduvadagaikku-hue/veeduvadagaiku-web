@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import { authenticate, optionalAuth } from '../middleware/auth';
+import { authenticate, optionalAuth, AuthRequest } from '../middleware/auth';
+import { Response, NextFunction } from 'express';
+import { ApiError } from '../utils/response';
 import { requireAdmin } from '../middleware/adminAuth';
 import {
   listWantedSpaces,
@@ -21,6 +23,13 @@ import {
 
 const router = Router();
 
+function requireWantedSpaceUser(req: AuthRequest, _res: Response, next: NextFunction) {
+  if (req.user?.role !== 'USER') {
+    return next(new ApiError(403, 'Only user accounts can post Wanted Specify requirements.'));
+  }
+  next();
+}
+
 // Public
 router.get('/', optionalAuth, listWantedSpaces);
 router.get('/:id', optionalAuth, getWantedSpace);
@@ -28,15 +37,15 @@ router.get('/:id', optionalAuth, getWantedSpace);
 // Webhook (no auth)
 router.post('/webhook', wantedSpaceWebhook);
 
-// Authenticated user routes
-router.post('/', authenticate, createWantedSpace);
-router.put('/:id', authenticate, updateWantedSpace);
-router.post('/:id/payment/initiate', authenticate, initiateWantedSpacePayment);
+// Wanted Specify posting and management are limited to user accounts. Owners may browse publicly.
+router.post('/', authenticate, requireWantedSpaceUser, createWantedSpace);
+router.put('/:id', authenticate, requireWantedSpaceUser, updateWantedSpace);
+router.post('/:id/payment/initiate', authenticate, requireWantedSpaceUser, initiateWantedSpacePayment);
 router.post('/payment/verify', optionalAuth, verifyWantedSpacePayment);
-router.get('/my/requirements', authenticate, myWantedSpaces);
-router.patch('/:id/fulfill', authenticate, markWantedSpaceFulfilled);
-router.delete('/:id', authenticate, deleteWantedSpace);
-router.post('/:id/renew', authenticate, renewWantedSpace);
+router.get('/my/requirements', authenticate, requireWantedSpaceUser, myWantedSpaces);
+router.patch('/:id/fulfill', authenticate, requireWantedSpaceUser, markWantedSpaceFulfilled);
+router.delete('/:id', authenticate, requireWantedSpaceUser, deleteWantedSpace);
+router.post('/:id/renew', authenticate, requireWantedSpaceUser, renewWantedSpace);
 
 // Admin routes
 router.get('/admin/all', authenticate, requireAdmin, adminListWantedSpaces);

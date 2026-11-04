@@ -26,4 +26,11 @@ export function getFirebaseAdmin(): admin.auth.Auth {
   return admin.auth();
 }
 
+export function getFirebaseMessaging(): admin.messaging.Messaging {
+  if (!firebaseApp) {
+    initFirebase();
+  }
+  return admin.messaging(firebaseApp);
+}
+
 export default admin;

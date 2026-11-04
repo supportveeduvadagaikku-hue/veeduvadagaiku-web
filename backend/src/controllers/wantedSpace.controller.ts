@@ -53,7 +53,7 @@ export async function listWantedSpaces(req: AuthRequest, res: Response, next: Ne
     const { category, city, locality, minBudget, maxBudget, requirementType, minArea, maxArea, search } = req.query;
 
     const where: any = {
-      status: 'PUBLISHED',
+      status: { in: ['PUBLISHED', 'PENDING_APPROVAL'] },
       OR: [
         { expiresAt: null },
         { expiresAt: { gt: new Date() } },
@@ -130,7 +130,7 @@ export async function getWantedSpace(req: AuthRequest, res: Response, next: Next
   try {
     const { id } = req.params;
     const space = await prisma.wantedSpace.findUnique({ where: { id } });
-    if (!space || space.status !== 'PUBLISHED') {
+    if (!space || !['PUBLISHED', 'PENDING_APPROVAL'].includes(space.status)) {
       throw new ApiError(404, 'Requirement not found');
     }
 
@@ -202,7 +202,7 @@ export async function createWantedSpace(req: AuthRequest, res: Response, next: N
       },
     });
 
-    res.status(201).json(successResponse(space, 'Requirement submitted successfully! Our team will review and publish it.'));
+    res.status(201).json(successResponse(space, 'Requirement saved.'));
   } catch (error) {
     next(error);
   }
@@ -279,22 +279,31 @@ export async function initiateWantedSpacePayment(req: AuthRequest, res: Response
     // Mark as payment pending
     await prisma.wantedSpace.update({ where: { id }, data: { status: 'PAYMENT_PENDING' } });
 
-    // If Cashfree not configured — bypass payment
-    if (!isCashfreeConfigured()) {
+    const isTestPaymentBypassEnabled = process.env.WANTED_SPACE_PAYMENT_BYPASS === 'true';
+
+    // Publish immediately when payment is bypassed or the gateway is not configured.
+    if (isTestPaymentBypassEnabled || !isCashfreeConfigured()) {
+      const publishedAt = new Date();
+      const expiresAt = new Date(publishedAt.getTime() + WANTED_VALIDITY_DAYS * 24 * 60 * 60 * 1000);
       await prisma.wantedSpace.update({
         where: { id },
         data: {
-          status: 'PENDING_APPROVAL',
-          paymentStatus: 'SUCCESS',
-          cfOrderId: `free_ws_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          transactionId: `free_ws_${Date.now()}`,
+          status: 'PUBLISHED',
+          paymentStatus: isTestPaymentBypassEnabled ? 'PENDING' : 'SUCCESS',
+          cfOrderId: isTestPaymentBypassEnabled
+            ? null
+            : `free_ws_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          transactionId: isTestPaymentBypassEnabled ? null : `free_ws_${Date.now()}`,
+          publishedAt,
+          expiresAt,
+          rejectionReason: null,
         },
       });
       return res.json({
         success: true,
         isFree: true,
-        status: 'PAID',
-        message: 'Requirement submitted for review.',
+        status: 'PUBLISHED',
+        message: 'Requirement published and visible in Wanted Specify.',
       });
     }
 
@@ -372,10 +381,16 @@ export async function verifyWantedSpacePayment(req: AuthRequest, res: Response, 
       if (wantedSpaceId) {
         await prisma.wantedSpace.update({
           where: { id: wantedSpaceId },
-          data: { status: 'PENDING_APPROVAL', paymentStatus: 'SUCCESS' },
+          data: {
+            status: 'PUBLISHED',
+            paymentStatus: 'SUCCESS',
+            publishedAt: new Date(),
+            expiresAt: new Date(Date.now() + WANTED_VALIDITY_DAYS * 24 * 60 * 60 * 1000),
+            rejectionReason: null,
+          },
         }).catch(() => {});
       }
-      return res.json({ success: true, status: 'PAID', message: 'Requirement submitted for review.' });
+      return res.json({ success: true, status: 'PAID', message: 'Requirement is published in Wanted Specify.' });
     }
 
     if (!isCashfreeConfigured()) {
@@ -393,15 +408,28 @@ export async function verifyWantedSpacePayment(req: AuthRequest, res: Response, 
       if (space) {
         await prisma.wantedSpace.update({
           where: { id: space.id },
-          data: { status: 'PENDING_APPROVAL', paymentStatus: 'SUCCESS', transactionId: cfRes.data.cf_order_id?.toString() || order_id },
+          data: {
+            status: 'PUBLISHED',
+            paymentStatus: 'SUCCESS',
+            transactionId: cfRes.data.cf_order_id?.toString() || order_id,
+            publishedAt: new Date(),
+            expiresAt: new Date(Date.now() + (space.validityDays || WANTED_VALIDITY_DAYS) * 24 * 60 * 60 * 1000),
+            rejectionReason: null,
+          },
         });
       } else if (wantedSpaceId) {
         await prisma.wantedSpace.update({
           where: { id: wantedSpaceId },
-          data: { status: 'PENDING_APPROVAL', paymentStatus: 'SUCCESS' },
+          data: {
+            status: 'PUBLISHED',
+            paymentStatus: 'SUCCESS',
+            publishedAt: new Date(),
+            expiresAt: new Date(Date.now() + WANTED_VALIDITY_DAYS * 24 * 60 * 60 * 1000),
+            rejectionReason: null,
+          },
         }).catch(() => {});
       }
-      return res.json({ success: true, status: 'PAID', message: 'Payment verified. Requirement submitted for review.' });
+      return res.json({ success: true, status: 'PAID', message: 'Payment verified. Requirement is published in Wanted Specify.' });
     } else {
       const space = await prisma.wantedSpace.findFirst({ where: { cfOrderId: order_id } });
       if (space) {
@@ -626,9 +654,12 @@ export async function wantedSpaceWebhook(req: AuthRequest, res: Response) {
         await prisma.wantedSpace.update({
           where: { id: space.id },
           data: {
-            status: 'PENDING_APPROVAL',
+            status: 'PUBLISHED',
             paymentStatus: 'SUCCESS',
             transactionId: event?.data?.payment?.cf_payment_id?.toString() || orderId,
+            publishedAt: now,
+            expiresAt,
+            rejectionReason: null,
           },
         }).catch(() => {});
       }

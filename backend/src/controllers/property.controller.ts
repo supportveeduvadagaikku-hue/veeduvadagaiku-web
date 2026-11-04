@@ -1,4 +1,5 @@
 import { Response, NextFunction, Request } from 'express';
+import { createHash } from 'crypto';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../config/database';
 import { successResponse, paginatedResponse, ApiError } from '../utils/response';
@@ -10,6 +11,7 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { renewPropertyListing } from '../services/validity.service';
+import { notifyPropertyView } from '../services/ownerNotification.service';
 
 // ─── Public Endpoints ───────────────────────────────────────────────
 
@@ -557,6 +559,25 @@ export async function getProperty(req: Request, res: Response, next: NextFunctio
 
     // Increment view count
     await prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+
+    // Notify an owner once per visitor/property/day. Never notify owners about
+    // their own views, and keep page loading independent of push delivery.
+    if (property.status === 'PUBLISHED' && user?.id !== property.owner.userId && user?.role !== 'ADMIN') {
+      const suppliedVisitorId = req.get('x-visit-id')?.slice(0, 128);
+      const visitorIdentity = user?.id || suppliedVisitorId || `${req.ip}:${req.get('user-agent') || ''}`;
+      const visitorKey = createHash('sha256')
+        .update(`${process.env.JWT_SECRET || 'vv-property-views'}:${visitorIdentity}`)
+        .digest('hex');
+      const visitDate = new Date();
+      visitDate.setUTCHours(0, 0, 0, 0);
+      void notifyPropertyView(
+        { id: property.id, ownerId: property.ownerId, title: property.title },
+        visitorKey,
+        visitDate
+      ).catch((notificationError) => {
+        console.warn('[Notifications] Could not record property view:', notificationError);
+      });
+    }
 
     res.json(successResponse(property));
   } catch (error) {
