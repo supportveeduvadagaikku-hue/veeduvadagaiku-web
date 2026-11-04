@@ -67,14 +67,7 @@ export const OwnerNotificationBell: React.FC = () => {
   useEffect(() => {
     const notifications = notificationData?.notifications;
     if (!notifications) return;
-    const currentIds = new Set(notifications.map((notification) => notification.id));
-    if (seenNotificationIds.current) {
-      const newNotifications = notifications.filter(
-        (notification) => !seenNotificationIds.current!.has(notification.id)
-      );
-      newNotifications.forEach((notification) => toast(`${notification.title}: ${notification.body}`));
-    }
-    seenNotificationIds.current = currentIds;
+    seenNotificationIds.current = new Set(notifications.map((notification) => notification.id));
   }, [notificationData?.notifications]);
 
   const handleEnablePush = async () => {

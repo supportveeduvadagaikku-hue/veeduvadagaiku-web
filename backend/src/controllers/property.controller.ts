@@ -639,10 +639,6 @@ export async function createProperty(req: AuthRequest, res: Response, next: Next
         status: 'DRAFT',
       },
     });
-
-    // Notify owner that property has been registered
-    void notifyPropertyRegistered(owner.id, { id: property.id, title: property.title })
-      .catch((err) => console.warn('[Notifications] Could not send registration notification:', err));
     res.status(201).json(successResponse(property, 'Property created as draft'));
   } catch (error) {
     next(error);

@@ -25,6 +25,21 @@ export async function sendOwnerPushNotification({
   body: string;
   href: string;
 }): Promise<void> {
+  if (propertyId) {
+    const recentExisting = await prisma.ownerNotification.findFirst({
+      where: {
+        ownerId,
+        propertyId,
+        title,
+        createdAt: { gte: new Date(Date.now() - 10 * 60 * 1000) },
+      },
+    });
+    if (recentExisting) {
+      // Avoid duplicate alert within 10 minutes
+      return;
+    }
+  }
+
   const visitDate = new Date();
   visitDate.setUTCHours(0, 0, 0, 0);
   const visitorKey = `alert_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
