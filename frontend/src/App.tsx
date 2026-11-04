@@ -4,6 +4,7 @@ import { getRedirectResult } from 'firebase/auth';
 import { auth } from './config/firebase';
 import { authService } from './services/auth.service';
 import { useAuth } from './hooks/useAuth';
+import { usePostLoginNotifications } from './hooks/usePostLoginNotifications';
 import toast from 'react-hot-toast';
 
 // Layouts
@@ -71,6 +72,9 @@ import { ManageEnquiriesPage } from './pages/admin/ManageEnquiriesPage';
 export const App: React.FC = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
+
+  // Auto-request push notification permission right after login
+  usePostLoginNotifications();
 
   // ─── ROOT-LEVEL Firebase redirect result handler ───────────────────────────
   // This runs on EVERY page load. It doesn't matter which URL Firebase
