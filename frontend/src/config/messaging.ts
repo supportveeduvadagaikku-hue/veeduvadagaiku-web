@@ -13,7 +13,9 @@ export async function enableBrowserPush(): Promise<string> {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) {
     throw new Error('This browser does not support push notifications.');
   }
-  const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+  const vapidKey =
+    import.meta.env.VITE_FIREBASE_VAPID_KEY ||
+    'BOasshgnL37xxy8KFi2oM2KPSfgHxSGxNftoxom4xNDuzLem3Wt-7Xlzgiu5SpeU4ADWOz5GyQHjE-Gjq2IFu0U';
   if (!vapidKey) {
     throw new Error('Browser alerts need the Firebase Web Push certificate key configured first.');
   }
