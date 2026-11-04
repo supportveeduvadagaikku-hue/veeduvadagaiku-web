@@ -5,6 +5,7 @@ import { successResponse, paginatedResponse, ApiError } from '../utils/response'
 import { rejectPropertySchema } from '../utils/validators';
 import { parsePaginationParams } from '../utils/helpers';
 import { resolvePlanValidityDays, calculateExpiryDate } from '../services/validity.service';
+import { notifyPropertyApproved, notifyPropertyRejected } from '../services/ownerNotification.service';
 
 export async function getDashboardStats(req: AuthRequest, res: Response, next: NextFunction) {
   try {
@@ -217,6 +218,14 @@ export async function adminApproveProperty(req: AuthRequest, res: Response, next
         rejectionReason: null,
       },
     });
+
+    // Notify owner via Web Push / In-App notification
+    void notifyPropertyApproved({
+      id: property.id,
+      ownerId: property.ownerId,
+      title: property.title,
+    }).catch((err) => console.warn('[Notifications] Could not send approval notification:', err));
+
     res.json(successResponse(null, 'Property approved and published'));
   } catch (error) {
     next(error);
@@ -233,6 +242,13 @@ export async function adminRejectProperty(req: AuthRequest, res: Response, next:
       where: { id: req.params.id },
       data: { status: 'REJECTED', rejectionReason: reason },
     });
+
+    // Notify owner
+    void notifyPropertyRejected(
+      { id: property.id, ownerId: property.ownerId, title: property.title },
+      reason
+    ).catch((err) => console.warn('[Notifications] Could not send rejection notification:', err));
+
     res.json(successResponse(null, 'Property rejected'));
   } catch (error) {
     next(error);

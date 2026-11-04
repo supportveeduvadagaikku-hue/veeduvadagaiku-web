@@ -2,8 +2,136 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database';
 import { getFirebaseMessaging } from '../config/firebase';
 
+interface PropertyRef {
+  id: string;
+  ownerId: string;
+  title: string;
+}
+
+/**
+ * Sends an in-app alert and Web Push notification (FCM) to a property owner.
+ */
+export async function sendOwnerPushNotification({
+  ownerId,
+  propertyId,
+  title,
+  body,
+  href,
+}: {
+  ownerId: string;
+  propertyId?: string;
+  title: string;
+  body: string;
+  href: string;
+}): Promise<void> {
+  const visitDate = new Date();
+  visitDate.setUTCHours(0, 0, 0, 0);
+  const visitorKey = `alert_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+  let notification;
+  try {
+    notification = await prisma.ownerNotification.create({
+      data: {
+        ownerId,
+        propertyId,
+        title,
+        body,
+        href,
+        visitorKey,
+        visitDate,
+      },
+    });
+  } catch (error) {
+    console.warn('[Notifications] Could not save notification to database:', error);
+  }
+
+  const subscriptions = await prisma.notificationPushToken.findMany({
+    where: { ownerId },
+    select: { id: true, token: true },
+  });
+  if (subscriptions.length === 0) return;
+
+  try {
+    const result = await getFirebaseMessaging().sendEachForMulticast({
+      tokens: subscriptions.map(({ token }) => token),
+      data: {
+        title,
+        body,
+        url: href,
+        notificationId: notification?.id || '',
+      },
+      webpush: {
+        fcmOptions: {
+          link: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${href}`,
+        },
+      },
+    });
+
+    const invalidTokens = result.responses.flatMap((response, index) => {
+      const code = response.error?.code;
+      return code === 'messaging/registration-token-not-registered' || code === 'messaging/invalid-registration-token'
+        ? [subscriptions[index].id]
+        : [];
+    });
+    if (invalidTokens.length) {
+      await prisma.notificationPushToken.deleteMany({ where: { id: { in: invalidTokens } } });
+    }
+  } catch (error) {
+    console.warn('[Notifications] Could not send FCM push notification:', error);
+  }
+}
+
+/**
+ * Notifies the owner that their property has been registered.
+ */
+export async function notifyPropertyRegistered(ownerId: string, property: { id: string; title: string }): Promise<void> {
+  await sendOwnerPushNotification({
+    ownerId,
+    propertyId: property.id,
+    title: 'Property Registered Successfully! 📝',
+    body: `Your property “${property.title}” has been registered and submitted for admin review.`,
+    href: '/owner/properties',
+  });
+}
+
+/**
+ * Notifies the owner that their listing has been submitted for review.
+ */
+export async function notifyPropertySubmitted(ownerId: string, property: { id: string; title: string }): Promise<void> {
+  await notifyPropertyRegistered(ownerId, property);
+}
+
+/**
+ * Notifies the owner that their listing has been approved by admin.
+ */
+export async function notifyPropertyApproved(property: PropertyRef): Promise<void> {
+  await sendOwnerPushNotification({
+    ownerId: property.ownerId,
+    propertyId: property.id,
+    title: 'Property Listing Approved! 🎉',
+    body: `Great news! Your property “${property.title}” has been approved and is now live on Veedu Vadagaikku.`,
+    href: `/property/${property.id}`,
+  });
+}
+
+/**
+ * Notifies the owner that their listing has been rejected by admin.
+ */
+export async function notifyPropertyRejected(property: PropertyRef, reason?: string): Promise<void> {
+  await sendOwnerPushNotification({
+    ownerId: property.ownerId,
+    propertyId: property.id,
+    title: 'Property Listing Update ⚠️',
+    body: `Your property “${property.title}” was not approved.${reason ? ` Reason: ${reason}` : ''}`,
+    href: '/owner/properties',
+  });
+}
+
+/**
+ * Records a unique daily property view and notifies the owner.
+ */
 export async function notifyPropertyView(
-  property: { id: string; ownerId: string; title: string },
+  property: PropertyRef,
   visitorKey: string,
   visitDate: Date
 ): Promise<void> {
@@ -21,7 +149,6 @@ export async function notifyPropertyView(
       },
     });
   } catch (error) {
-    // A visitor only generates one alert for the same property each day.
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') return;
     throw error;
   }
@@ -56,7 +183,6 @@ export async function notifyPropertyView(
       await prisma.notificationPushToken.deleteMany({ where: { id: { in: invalidTokens } } });
     }
   } catch (error) {
-    // Push delivery is best-effort; the saved in-app notification remains available.
     console.warn('[Notifications] Could not send property-view push notification:', error);
   }
 }

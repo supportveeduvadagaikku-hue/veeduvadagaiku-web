@@ -11,7 +11,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { renewPropertyListing } from '../services/validity.service';
 import { createHash } from 'crypto';
-import { notifyPropertyView } from '../services/ownerNotification.service';
+import { notifyPropertyView, notifyPropertySubmitted, notifyPropertyRegistered } from '../services/ownerNotification.service';
 
 // ─── Public Endpoints ───────────────────────────────────────────────
 
@@ -639,6 +639,10 @@ export async function createProperty(req: AuthRequest, res: Response, next: Next
         status: 'DRAFT',
       },
     });
+
+    // Notify owner that property has been registered
+    void notifyPropertyRegistered(owner.id, { id: property.id, title: property.title })
+      .catch((err) => console.warn('[Notifications] Could not send registration notification:', err));
     res.status(201).json(successResponse(property, 'Property created as draft'));
   } catch (error) {
     next(error);
@@ -940,6 +944,9 @@ export async function submitForReview(req: AuthRequest, res: Response, next: Nex
       where: { id },
       data: { status: 'PENDING_APPROVAL', rejectionReason: null },
     });
+
+    void notifyPropertySubmitted(owner.id, { id: property.id, title: property.title })
+      .catch((err) => console.warn('[Notifications] Could not send submission notification:', err));
 
     res.json(successResponse(null, 'Property submitted for admin review. It will be published once approved.'));
   } catch (error) {
