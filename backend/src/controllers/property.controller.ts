@@ -1,5 +1,4 @@
 import { Response, NextFunction, Request } from 'express';
-import { createHash } from 'crypto';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../config/database';
 import { successResponse, paginatedResponse, ApiError } from '../utils/response';
@@ -11,6 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { renewPropertyListing } from '../services/validity.service';
+import { createHash } from 'crypto';
 import { notifyPropertyView } from '../services/ownerNotification.service';
 
 // ─── Public Endpoints ───────────────────────────────────────────────
@@ -574,12 +574,30 @@ export async function getProperty(req: Request, res: Response, next: NextFunctio
         { id: property.id, ownerId: property.ownerId, title: property.title },
         visitorKey,
         visitDate
-      ).catch((notificationError) => {
+      ).catch((notificationError: any) => {
         console.warn('[Notifications] Could not record property view:', notificationError);
       });
     }
 
-    res.json(successResponse(property));
+    // Owner phone numbers are private contact details. Only include them in
+    // the public detail response after the visitor has authenticated with a
+    // verified mobile number; hiding them in the UI alone is not sufficient.
+    const propertyForResponse = {
+      ...property,
+      owner: property.owner
+        ? {
+            ...property.owner,
+            user: property.owner.user
+              ? {
+                  ...property.owner.user,
+                  mobile: user?.mobile ? property.owner.user.mobile : null,
+                }
+              : property.owner.user,
+          }
+        : property.owner,
+    };
+
+    res.json(successResponse(propertyForResponse));
   } catch (error) {
     next(error);
   }
