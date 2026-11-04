@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../config/database';
 import { successResponse, ApiError } from '../utils/response';
 import axios from 'axios';
+import { sendPropertyRegistrationWhatsApp } from '../services/whatsapp.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -294,24 +295,33 @@ export async function verifyCashfreePayment(req: Request, res: Response, next: N
     const orderStatus = cfOrder.order_status; // PAID, ACTIVE, EXPIRED, etc.
 
     if (orderStatus === 'PAID') {
-      await prisma.payment.updateMany({
-        where: { cfOrderId: resolvedOrderId },
+      const newlyPaid = await prisma.payment.updateMany({
+        where: { cfOrderId: resolvedOrderId, paymentStatus: 'PENDING' },
         data: {
           paymentStatus: 'SUCCESS',
           transactionId: cfOrder.cf_order_id?.toString() || resolvedOrderId,
         },
       }).catch(() => {});
 
-      // Update property status
-      const targetPropertyId = propertyId || (await prisma.payment.findFirst({
+      const paymentRecord = await prisma.payment.findFirst({
         where: { cfOrderId: resolvedOrderId },
-      }).catch(() => null))?.propertyId;
+        include: { user: { select: { name: true, mobile: true } }, property: { select: { title: true } } },
+      }).catch(() => null);
+      const targetPropertyId = propertyId || paymentRecord?.propertyId;
 
       if (targetPropertyId) {
         await prisma.property.update({
           where: { id: targetPropertyId },
           data: { status: 'PENDING_APPROVAL', rejectionReason: null },
         }).catch(() => {});
+      }
+
+      if (newlyPaid && newlyPaid.count > 0 && paymentRecord) {
+        void sendPropertyRegistrationWhatsApp({
+          phone: paymentRecord.user.mobile,
+          ownerName: paymentRecord.user.name,
+          propertyTitle: paymentRecord.property.title,
+        });
       }
 
       return res.status(200).json({
@@ -369,13 +379,14 @@ export async function cashfreeWebhook(req: Request, res: Response) {
     const paymentStatus = event?.data?.payment?.payment_status;
 
     if (orderId && (orderStatus === 'PAID' || paymentStatus === 'SUCCESS')) {
-      await prisma.payment.updateMany({
-        where: { cfOrderId: orderId },
+      const newlyPaid = await prisma.payment.updateMany({
+        where: { cfOrderId: orderId, paymentStatus: 'PENDING' },
         data: { paymentStatus: 'SUCCESS' },
       }).catch(() => {});
 
       const paymentRecord = await prisma.payment.findFirst({
         where: { cfOrderId: orderId },
+        include: { user: { select: { name: true, mobile: true } }, property: { select: { title: true } } },
       }).catch(() => null);
 
       if (paymentRecord?.propertyId) {
@@ -383,6 +394,14 @@ export async function cashfreeWebhook(req: Request, res: Response) {
           where: { id: paymentRecord.propertyId },
           data: { status: 'PENDING_APPROVAL', rejectionReason: null },
         }).catch(() => {});
+      }
+
+      if (newlyPaid && newlyPaid.count > 0 && paymentRecord) {
+        void sendPropertyRegistrationWhatsApp({
+          phone: paymentRecord.user.mobile,
+          ownerName: paymentRecord.user.name,
+          propertyTitle: paymentRecord.property.title,
+        });
       }
     }
 
