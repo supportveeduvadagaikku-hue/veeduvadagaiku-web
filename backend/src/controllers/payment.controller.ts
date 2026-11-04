@@ -4,7 +4,7 @@ import { prisma } from '../config/database';
 import { successResponse, ApiError } from '../utils/response';
 import axios from 'axios';
 import { sendPropertyRegistrationWhatsApp } from '../services/whatsapp.service';
-import { notifyPropertyRegistered } from '../services/ownerNotification.service';
+import { notifyPropertyRegistered, notifyAdminNewSubmission } from '../services/ownerNotification.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

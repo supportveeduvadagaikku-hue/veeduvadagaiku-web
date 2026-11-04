@@ -11,7 +11,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { renewPropertyListing } from '../services/validity.service';
 import { createHash } from 'crypto';
-import { notifyPropertyView, notifyPropertySubmitted, notifyPropertyRegistered } from '../services/ownerNotification.service';
+import { notifyPropertyView, notifyPropertySubmitted, notifyPropertyRegistered, notifyAdminNewSubmission } from '../services/ownerNotification.service';
 
 // ─── Public Endpoints ───────────────────────────────────────────────
 
@@ -943,6 +943,10 @@ export async function submitForReview(req: AuthRequest, res: Response, next: Nex
 
     void notifyPropertySubmitted(owner.id, { id: property.id, title: property.title })
       .catch((err) => console.warn('[Notifications] Could not send submission notification:', err));
+
+    // Notify all admins that a new property is pending review
+    void notifyAdminNewSubmission({ id: property.id, title: property.title, ownerId: owner.id })
+      .catch((err) => console.warn('[Notifications] Could not send admin submission alert:', err));
 
     res.json(successResponse(null, 'Property submitted for admin review. It will be published once approved.'));
   } catch (error) {

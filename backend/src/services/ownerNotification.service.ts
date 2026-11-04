@@ -147,6 +147,88 @@ export async function notifyPropertySubmitted(ownerId: string, property: { id: s
 }
 
 /**
+ * Notifies ALL admin users that a new property has been submitted for their review.
+ * Finds all ADMIN-role users, looks up their Owner records, and sends FCM push notifications
+ * to any registered push tokens.
+ */
+export async function notifyAdminNewSubmission(property: { id: string; title: string; ownerId: string }): Promise<void> {
+  try {
+    // Find all admin users who have an associated Owner record with push tokens
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: {
+        id: true,
+        name: true,
+        owner: {
+          select: {
+            id: true,
+            pushTokens: {
+              select: { id: true, token: true },
+            },
+          },
+        },
+      },
+    });
+
+    const allTokens: { id: string; token: string }[] = admins
+      .flatMap((admin) => admin.owner?.pushTokens ?? []);
+
+    if (allTokens.length === 0) {
+      console.info('[Notifications] No admin push tokens registered — skipping admin alert.');
+      return;
+    }
+
+    const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/admin/pending`;
+    const title = 'New Property Pending Review 🏠';
+    const body = `"${property.title}" has been submitted by an owner and is awaiting your approval.`;
+
+    const result = await getFirebaseMessaging().sendEachForMulticast({
+      tokens: allTokens.map(({ token }) => token),
+      notification: { title, body },
+      data: {
+        title,
+        body,
+        url: targetLink,
+        click_action: targetLink,
+      },
+      webpush: {
+        notification: {
+          title,
+          body,
+          icon: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/favicon.ico`,
+          badge: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/favicon.ico`,
+          vibrate: [200, 100, 200],
+        },
+        fcmOptions: { link: targetLink },
+      },
+      android: {
+        priority: 'high',
+        notification: {
+          sound: 'default',
+          priority: 'max',
+          channelId: 'default',
+        },
+      },
+    });
+
+    // Clean up invalid admin tokens
+    const invalidTokenIds = result.responses.flatMap((response, index) => {
+      const code = response.error?.code;
+      return code === 'messaging/registration-token-not-registered' || code === 'messaging/invalid-registration-token'
+        ? [allTokens[index].id]
+        : [];
+    });
+    if (invalidTokenIds.length) {
+      await prisma.notificationPushToken.deleteMany({ where: { id: { in: invalidTokenIds } } });
+    }
+
+    console.info(`[Notifications] Admin alert sent to ${result.successCount} admin(s) for property "${property.title}".`);
+  } catch (error) {
+    console.warn('[Notifications] Could not send admin property submission alert:', error);
+  }
+}
+
+/**
  * Notifies the owner that their listing has been approved by admin.
  */
 export async function notifyPropertyApproved(property: PropertyRef): Promise<void> {
