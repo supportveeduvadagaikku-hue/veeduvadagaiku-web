@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Veedu Vadagaikku Chennai",
   "short_name": "Veedu Vadagaikku",
-  "description": "Property owner alerts and rental listings in Chennai.",
+  "description": "Property rental listings and owner alerts in Chennai.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -11,9 +11,21 @@
   "icons": [
     {
       "src": "/logo-emblem.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-emblem.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-emblem.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

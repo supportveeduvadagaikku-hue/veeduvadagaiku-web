@@ -31,6 +31,7 @@ export const OwnerNotificationBell: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['ownerNotifications'] });
       const title = payload.notification?.title || payload.data?.title || 'Veedu Vadagaikku Alert';
       const body = payload.notification?.body || payload.data?.body || 'New property update.';
+      const tag = payload.data?.tag || payload.data?.notificationId || 'veedu_alert';
 
       // Show actual native OS mobile/system notification
       if ('Notification' in window && Notification.permission === 'granted') {
@@ -38,12 +39,14 @@ export const OwnerNotificationBell: React.FC = () => {
           navigator.serviceWorker.ready.then((reg) => {
             reg.showNotification(title, {
               body,
-              icon: '/favicon.ico',
-              badge: '/favicon.ico',
+              icon: '/logo-emblem.png',
+              badge: '/logo-emblem.png',
+              tag,
+              renotify: false,
               data: { url: payload.data?.url || '/owner/properties' },
             } as any);
           }).catch(() => {
-            new Notification(title, { body, icon: '/favicon.ico' });
+            new Notification(title, { body, icon: '/logo-emblem.png', tag } as any);
           });
         } catch {}
       }

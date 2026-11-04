@@ -68,6 +68,8 @@ export async function sendOwnerPushNotification({
   if (subscriptions.length === 0) return;
 
   const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${href}`;
+  const logoUrl = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/logo-emblem.png`;
+  const notificationTag = propertyId ? `property_${propertyId}` : (notification?.id || 'veedu_alert');
 
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
@@ -81,6 +83,7 @@ export async function sendOwnerPushNotification({
         body,
         url: href,
         notificationId: notification?.id || '',
+        tag: notificationTag,
       },
       webpush: {
         headers: {
@@ -89,12 +92,12 @@ export async function sendOwnerPushNotification({
         notification: {
           title,
           body,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
+          icon: logoUrl,
+          badge: logoUrl,
           requireInteraction: true,
           vibrate: [200, 100, 200],
-          tag: notification?.id || 'veedu-alert',
-          renotify: true,
+          tag: notificationTag,
+          renotify: false,
         },
         fcmOptions: {
           link: targetLink,
@@ -108,6 +111,7 @@ export async function sendOwnerPushNotification({
           sound: 'default',
           priority: 'max',
           channelId: 'default',
+          tag: notificationTag,
         },
       },
     });
@@ -179,8 +183,10 @@ export async function notifyAdminNewSubmission(property: { id: string; title: st
     }
 
     const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/admin/pending`;
+    const logoUrl = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/logo-emblem.png`;
     const title = 'New Property Pending Review 🏠';
     const body = `"${property.title}" has been submitted by an owner and is awaiting your approval.`;
+    const tag = `admin_pending_${property.id}`;
 
     const result = await getFirebaseMessaging().sendEachForMulticast({
       tokens: allTokens.map(({ token }) => token),
@@ -190,14 +196,17 @@ export async function notifyAdminNewSubmission(property: { id: string; title: st
         body,
         url: targetLink,
         click_action: targetLink,
+        tag,
       },
       webpush: {
         notification: {
           title,
           body,
-          icon: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/favicon.ico`,
-          badge: `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/favicon.ico`,
+          icon: logoUrl,
+          badge: logoUrl,
           vibrate: [200, 100, 200],
+          tag,
+          renotify: false,
         },
         fcmOptions: { link: targetLink },
       },
@@ -207,6 +216,7 @@ export async function notifyAdminNewSubmission(property: { id: string; title: st
           sound: 'default',
           priority: 'max',
           channelId: 'default',
+          tag,
         },
       },
     });
@@ -287,6 +297,8 @@ export async function notifyPropertyView(
   if (subscriptions.length === 0) return;
 
   const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/owner/properties`;
+  const logoUrl = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/logo-emblem.png`;
+  const viewTag = `view_${property.id}_${visitorKey}`;
 
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
@@ -300,6 +312,7 @@ export async function notifyPropertyView(
         body: notification.body,
         url: notification.href,
         notificationId: notification.id,
+        tag: viewTag,
       },
       webpush: {
         headers: {
@@ -308,12 +321,12 @@ export async function notifyPropertyView(
         notification: {
           title: notification.title,
           body: notification.body,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
+          icon: logoUrl,
+          badge: logoUrl,
           requireInteraction: true,
           vibrate: [200, 100, 200],
-          tag: notification.id,
-          renotify: true,
+          tag: viewTag,
+          renotify: false,
         },
         fcmOptions: {
           link: targetLink,
@@ -327,6 +340,7 @@ export async function notifyPropertyView(
           sound: 'default',
           priority: 'max',
           channelId: 'default',
+          tag: viewTag,
         },
       },
     });
