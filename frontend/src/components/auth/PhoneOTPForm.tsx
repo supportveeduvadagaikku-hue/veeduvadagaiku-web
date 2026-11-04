@@ -35,8 +35,12 @@ function getFriendlyFirebaseError(err: any): string {
   if (code.includes('invalid-verification-code')) {
     return 'Incorrect 6-digit OTP. Please check and re-enter.';
   }
-  if (code.includes('credential-already-in-use')) {
-    return 'This phone number is already linked to another account. Sign in to that account or use a different number.';
+  if (
+    code.includes('account-exists-with-different-credential') ||
+    code.includes('credential-already-in-use') ||
+    code.includes('phone-number-already-exists')
+  ) {
+    return 'This phone number is already linked to another account. Use a different number you control, or contact support to link the accounts without losing your listings.';
   }
   if (code.includes('code-expired')) {
     return 'OTP has expired. Please request a new OTP.';
