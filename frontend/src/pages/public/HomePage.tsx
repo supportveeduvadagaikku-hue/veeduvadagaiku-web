@@ -199,7 +199,7 @@ export const HomePage: React.FC = () => {
         <div className="relative max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* Top Tagline */}
           <div className="text-center space-y-2 max-w-3xl mx-auto px-2">
-            <h1 className="text-xl sm:text-3xl lg:text-[2.25rem] font-bold sm:font-extrabold tracking-tight leading-snug sm:leading-tight text-[#1E2329]">
+            <h1 className="font-editorial text-xl sm:text-3xl lg:text-[2.25rem] font-bold sm:font-extrabold tracking-tight leading-snug sm:leading-tight text-[#1E2329]">
               <span className="text-[#C5A059]">{t('hero.title1')}</span>{' '}
               <span className="text-[#C5A059]">{t('hero.titleHouse')}</span>
             </h1>

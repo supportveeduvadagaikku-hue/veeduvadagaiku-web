@@ -73,6 +73,7 @@ export default {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'Noto Sans Tamil', 'system-ui', '-apple-system', 'sans-serif'],
         display: ['"Plus Jakarta Sans"', 'Inter', 'Noto Sans Tamil', 'sans-serif'],
+        editorial: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-in-out',
