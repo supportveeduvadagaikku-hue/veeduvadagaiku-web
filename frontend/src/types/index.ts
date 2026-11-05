@@ -108,10 +108,18 @@ export interface Property {
 export interface ListingPlan {
   id: string;
   name: string;
+  nameTamil?: string | null;
+  badge?: string | null;
   price: number;
+  strikePrice?: string | null;
   durationDays: number;
   description: string;
   features: string[];
+  ctaLabel?: string | null;
+  ctaLink?: string | null;
+  isPremium?: boolean;
+  isOffer?: boolean;
+  enabledCount?: number;
   isActive: boolean;
   sortOrder: number;
 }

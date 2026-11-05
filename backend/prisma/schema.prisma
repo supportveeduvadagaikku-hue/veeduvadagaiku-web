@@ -154,10 +154,18 @@ model PropertyImage {
 model ListingPlan {
   id           String   @id @default(cuid())
   name         String
+  nameTamil    String?
+  badge        String?
   price        Float
+  strikePrice  String?
   durationDays Int
-  description  String
+  description  String   @default("")
   features     String[] @default([])
+  ctaLabel     String?
+  ctaLink      String?
+  isPremium    Boolean  @default(false)
+  isOffer      Boolean  @default(false)
+  enabledCount Int      @default(5)
   isActive     Boolean  @default(true)
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())

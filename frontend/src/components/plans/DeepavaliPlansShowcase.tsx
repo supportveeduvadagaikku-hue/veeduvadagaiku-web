@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { planService } from "../../services/plan.service";
 import {
   Sparkles,
   ArrowRight,
@@ -116,9 +118,71 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
   isOwnerView = false,
   hideHeroBrandBar = false,
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState("HALL");
+  const { data: plansResponse } = useQuery({
+    queryKey: ['listingPlans'],
+    queryFn: () => planService.getPlans(),
+    staleTime: 60 * 1000,
+  });
+
+  const displayPlans = useMemo(() => {
+    const serverPlans = plansResponse?.data?.filter((p) => p.isActive) || [];
+    if (serverPlans.length === 0) return PLANS;
+
+    return serverPlans.map((p) => {
+      const isOffer = p.isOffer ?? (p.price === 0 || p.id.includes('free'));
+      const isPremium = p.isPremium ?? (p.price >= 1000 || p.name.toLowerCase().includes('mandapam') || p.name.toLowerCase().includes('hall'));
+
+      let badge = p.badge;
+      if (!badge) {
+        if (isOffer) badge = 'DEEPAVALI OFFER';
+        else if (isPremium) badge = 'PREMIUM VENUE';
+        else if (p.name.toLowerCase().includes('residential') || p.name.toLowerCase().includes('home') || p.name.toLowerCase().includes('house')) badge = 'RESIDENTIAL';
+        else if (p.name.toLowerCase().includes('service')) badge = 'HOME SERVICES';
+        else if (p.name.toLowerCase().includes('commercial') || p.name.toLowerCase().includes('shop')) badge = 'SHOPS & COMMERCIAL';
+        else badge = p.name.toUpperCase();
+      }
+
+      let badgeCls = "bg-amber-50 text-[#92400e] border border-amber-200";
+      if (isOffer) badgeCls = "bg-[#f59e0b] text-[#1b0610]";
+      else if (isPremium) badgeCls = "bg-[#240a15] text-[#f59e0b]";
+
+      return {
+        id: p.id,
+        badge,
+        badgeCls,
+        name: p.name,
+        nameTamil: p.nameTamil || '',
+        price: `₹${p.price.toLocaleString('en-IN')}`,
+        rawPrice: p.price,
+        strikePrice: p.strikePrice || (isOffer ? '₹99-₹2,500' : null),
+        period: `per listing · ${p.durationDays} days`,
+        durationDays: p.durationDays,
+        ctaLabel: p.ctaLabel || (isOffer ? 'Post your property for free' : `List a ${p.name}`),
+        ctaLink: p.ctaLink || '/owner/properties/add',
+        enabledCount: p.enabledCount ?? (isPremium ? 8 : p.price > 500 ? 7 : p.price > 200 ? 6 : 5),
+        isOffer,
+        isPremium,
+      };
+    });
+  }, [plansResponse]);
+
+  const [selectedPlan, setSelectedPlan] = useState<string>("plan_kalyana_mandapam");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 16, hours: 3, minutes: 22, seconds: 40 });
+
+  useEffect(() => {
+    if (displayPlans.length > 0 && !displayPlans.some((p) => p.id === selectedPlan)) {
+      const preferred = displayPlans.find((p) => p.isPremium) || displayPlans[displayPlans.length - 1] || displayPlans[0];
+      if (preferred) setSelectedPlan(preferred.id);
+    }
+  }, [displayPlans, selectedPlan]);
+
+  const activePlan = useMemo(() => {
+    return displayPlans.find((p) => p.id === selectedPlan) ??
+           displayPlans.find((p) => p.isPremium) ??
+           displayPlans[displayPlans.length - 1] ??
+           displayPlans[0];
+  }, [displayPlans, selectedPlan]);
 
   useEffect(() => {
     const targetDate = new Date("2026-11-08T23:59:59+05:30").getTime();
@@ -139,8 +203,6 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const activePlan = PLANS.find((p) => p.id === selectedPlan) ?? PLANS[PLANS.length - 1];
 
   const faqs = [
     {
@@ -310,7 +372,7 @@ export const DeepavaliPlansShowcase: React.FC<DeepavaliPlansShowcaseProps> = ({
         {/* Plan Cards */}
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pt-5 pb-4">
           <div className="flex gap-4 min-w-max sm:min-w-0 sm:grid sm:grid-cols-5">
-            {PLANS.map((plan) => {
+            {displayPlans.map((plan) => {
               const isActive = selectedPlan === plan.id;
               return (
                 <button

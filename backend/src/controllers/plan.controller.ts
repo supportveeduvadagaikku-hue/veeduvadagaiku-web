@@ -11,53 +11,53 @@ export async function syncPromotionalPlan() {
     const offer = getNavaratriOffer();
     const active = isOfferActive(offer);
 
-    // Sync primary plan (plan_deepavali_free)
-    await prisma.listingPlan.upsert({
-      where: { id: offer.planId },
-      update: {
-        name: offer.planName,
-        price: offer.price,
-        durationDays: offer.durationDays,
-        description: offer.description,
-        features: offer.features,
-        isActive: active,
-        sortOrder: 0,
-      },
-      create: {
-        id: offer.planId,
-        name: offer.planName,
-        price: offer.price,
-        durationDays: offer.durationDays,
-        description: offer.description,
-        features: offer.features,
-        isActive: active,
-        sortOrder: 0,
-      },
-    });
+    const existingPrimary = await prisma.listingPlan.findUnique({ where: { id: offer.planId } });
+    if (!existingPrimary) {
+      await prisma.listingPlan.create({
+        data: {
+          id: offer.planId,
+          name: offer.planName,
+          nameTamil: 'தீபாவளி இலவச சலுகை',
+          badge: 'DEEPAVALI OFFER',
+          price: offer.price,
+          strikePrice: '₹99-₹2,500',
+          durationDays: offer.durationDays,
+          description: offer.description,
+          features: offer.features,
+          ctaLabel: offer.ctaText,
+          ctaLink: offer.ctaLink,
+          isOffer: true,
+          isPremium: false,
+          enabledCount: 5,
+          isActive: active,
+          sortOrder: 0,
+        },
+      });
+    }
 
-    // Also sync legacy plan_navaratri_free as alias so older references don't break
-    await prisma.listingPlan.upsert({
-      where: { id: 'plan_navaratri_free' },
-      update: {
-        name: offer.planName,
-        price: offer.price,
-        durationDays: offer.durationDays,
-        description: offer.description,
-        features: offer.features,
-        isActive: active,
-        sortOrder: 0,
-      },
-      create: {
-        id: 'plan_navaratri_free',
-        name: offer.planName,
-        price: offer.price,
-        durationDays: offer.durationDays,
-        description: offer.description,
-        features: offer.features,
-        isActive: active,
-        sortOrder: 0,
-      },
-    });
+    const existingLegacy = await prisma.listingPlan.findUnique({ where: { id: 'plan_navaratri_free' } });
+    if (!existingLegacy) {
+      await prisma.listingPlan.create({
+        data: {
+          id: 'plan_navaratri_free',
+          name: offer.planName,
+          nameTamil: 'தீபாவளி இலவச சலுகை',
+          badge: 'DEEPAVALI OFFER',
+          price: offer.price,
+          strikePrice: '₹99-₹2,500',
+          durationDays: offer.durationDays,
+          description: offer.description,
+          features: offer.features,
+          ctaLabel: offer.ctaText,
+          ctaLink: offer.ctaLink,
+          isOffer: true,
+          isPremium: false,
+          enabledCount: 5,
+          isActive: active,
+          sortOrder: 0,
+        },
+      });
+    }
   } catch (err) {
     console.warn('[syncPromotionalPlan] Failed to sync promo plan:', err);
   }

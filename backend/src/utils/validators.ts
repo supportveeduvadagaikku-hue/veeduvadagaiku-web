@@ -53,10 +53,18 @@ export const updateProfileSchema = z.object({
 
 export const createPlanSchema = z.object({
   name: z.string().min(1),
+  nameTamil: z.string().optional().nullable(),
+  badge: z.string().optional().nullable(),
   price: z.number().min(0),
+  strikePrice: z.string().optional().nullable(),
   durationDays: z.number().int().positive(),
-  description: z.string().min(1),
+  description: z.string().optional().default(''),
   features: z.array(z.string()).optional(),
+  ctaLabel: z.string().optional().nullable(),
+  ctaLink: z.string().optional().nullable(),
+  isPremium: z.boolean().optional(),
+  isOffer: z.boolean().optional(),
+  enabledCount: z.number().int().optional(),
   isActive: z.boolean().optional(),
   sortOrder: z.number().int().optional(),
 });
