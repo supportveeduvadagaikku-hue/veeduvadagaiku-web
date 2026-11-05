@@ -14,32 +14,73 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 /**
- * Background message handler (fires when app is in background or closed).
- * This is the ONLY place we show a notification — the generic `push` event
- * is intentionally NOT registered to prevent duplicate notifications.
+ * In-memory dedup: track tags shown in the last 30 seconds.
+ * This prevents the same message received via two FCM tokens (old + new token
+ * still stored in DB) from producing duplicate OS notifications on one device.
+ */
+const recentlyShownTags = new Map(); // tag -> timestamp (ms)
+
+function wasRecentlyShown(tag) {
+  const ts = recentlyShownTags.get(tag);
+  if (!ts) return false;
+  if (Date.now() - ts < 30000) return true; // 30-second dedup window
+  recentlyShownTags.delete(tag);
+  return false;
+}
+
+function markShown(tag) {
+  recentlyShownTags.set(tag, Date.now());
+  // Housekeeping — cap map size to avoid memory leak in long-lived SW
+  if (recentlyShownTags.size > 100) {
+    const cutoff = Date.now() - 60000;
+    for (const [k, v] of recentlyShownTags) {
+      if (v < cutoff) recentlyShownTags.delete(k);
+    }
+  }
+}
+
+/**
+ * Background message handler — fires when the app tab is hidden or closed.
+ * This is the ONLY handler that calls showNotification().
+ * The raw 'push' event is NOT registered so Firebase handles dedup internally.
  */
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title || payload.data?.title || 'Veedu Vadagaikku Alert';
+  const title = payload.notification?.title || payload.data?.title || 'Veedu Vadagaikku';
   const body  = payload.notification?.body  || payload.data?.body  || 'New property update.';
   const url   = payload.data?.url || '/owner/properties';
 
-  // Use a fixed tag based on title+property so identical alerts collapse into one
+  // Stable tag collapses identical alerts in the OS tray
   const tag = payload.data?.tag || payload.data?.notificationId
     || `veedu-${(payload.data?.title || title).replace(/\s+/g, '-').toLowerCase().slice(0, 40)}`;
 
-  self.registration.showNotification(title, {
-    body,
-    icon:    '/logo-emblem.png',   // 512×512 website logo
-    badge:   '/logo-emblem.png',   // small monochrome badge on status bar
-    image:   '/logo-emblem.png',   // expanded image inside notification
-    vibrate: [200, 100, 200],
-    data:    { url },
-    tag,                           // collapses duplicate notifications with same tag
-    renotify: false,               // don't re-buzz if collapsed
+  // 1. In-memory dedup (catches second FCM delivery within 30 s)
+  if (wasRecentlyShown(tag)) {
+    console.log('[SW] Duplicate suppressed (in-memory):', tag);
+    return; // ← return here is safe; onBackgroundMessage does NOT need waitUntil
+  }
+
+  markShown(tag);
+
+  // 2. OS-tray dedup: if a notification with this tag already sits in the tray, skip
+  //    (uses a self-contained promise chain — no event.waitUntil needed here)
+  self.registration.getNotifications({ tag }).then((existing) => {
+    if (existing.length > 0) {
+      console.log('[SW] Duplicate suppressed (tray):', tag);
+      return;
+    }
+    return self.registration.showNotification(title, {
+      body,
+      icon:     '/logo-emblem.png',
+      badge:    '/logo-emblem.png',
+      vibrate:  [200, 100, 200],
+      data:     { url },
+      tag,
+      renotify: false,
+    });
   });
 });
 
-// Click handler — open / focus the app page linked in the notification
+// Notification click — navigate to the linked page
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const target = new URL(

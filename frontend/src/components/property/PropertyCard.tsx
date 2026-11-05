@@ -57,6 +57,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               src={primaryImg}
               alt=""
               aria-hidden="true"
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover blur-md opacity-25 scale-110 pointer-events-none select-none"
               onError={() => setImgFailed(true)}
             />

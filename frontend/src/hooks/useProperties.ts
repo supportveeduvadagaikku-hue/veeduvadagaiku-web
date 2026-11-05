@@ -7,6 +7,11 @@ export const useProperties = (filters: PropertyFilters = {}) => {
   return useQuery({
     queryKey: ['properties', filters],
     queryFn: () => propertyService.getProperties(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes freshness: instant rendering on back-navigation
+    gcTime: 30 * 60 * 1000,    // 30 minutes cache retention
+    refetchOnWindowFocus: false, // Don't trigger slow re-renders when tapping outside browser
+    refetchOnMount: false,       // Don't refetch if data is already in cache
+    placeholderData: (previousData) => previousData, // Never show blank screen while refreshing
   });
 };
 
@@ -15,6 +20,9 @@ export const useProperty = (id: string) => {
     queryKey: ['property', id],
     queryFn: () => propertyService.getPropertyById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -36,5 +44,6 @@ export const useLocalities = () => {
     },
     initialData: CHENNAI_LOCALITIES,
     staleTime: 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
   });
 };

@@ -75,11 +75,6 @@ async function handleFreeOrder(req: AuthRequest, res: Response, next: NextFuncti
             },
           }).catch(() => {});
         }
-
-        if (owner && property) {
-          void notifyPropertyRegistered(owner.id, { id: property.id, title: property.title })
-            .catch((err) => console.warn('[Notifications] Could not send free listing registration push notification:', err));
-        }
       }
     }
 

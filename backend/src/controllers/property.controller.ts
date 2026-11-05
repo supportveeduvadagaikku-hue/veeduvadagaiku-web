@@ -519,7 +519,27 @@ export async function listProperties(req: Request, res: Response, next: NextFunc
       prisma.property.count({ where }),
     ]);
 
-    res.json(paginatedResponse(properties, total, page, limit));
+    const cleanedProperties = properties.map((p) => {
+      let images = p.images;
+      if ((!images || images.length === 0) && Array.isArray(p.amenities)) {
+        const primaryTag = p.amenities.find((a) => a.startsWith('[IMG_PRIMARY:') && a.endsWith(']'));
+        if (primaryTag) {
+          const b64 = primaryTag.slice('[IMG_PRIMARY:'.length, -1);
+          if (b64.startsWith('data:image/')) {
+            images = [{ id: `b64_${p.id}`, propertyId: p.id, imageUrl: b64, publicId: '', isPrimary: true, displayOrder: 0, createdAt: p.createdAt } as any];
+          }
+        }
+      }
+      const cleanAmenities = Array.isArray(p.amenities)
+        ? p.amenities.filter((a) => !a.startsWith('[IMG_PRIMARY:') && !a.startsWith('[IMG_EXTRA:') && !a.startsWith('data:image/'))
+        : [];
+      return {
+        ...p,
+        images,
+        amenities: cleanAmenities,
+      };
+    });
+    res.json(paginatedResponse(cleanedProperties, total, page, limit));
   } catch (error) {
     next(error);
   }
@@ -721,7 +741,27 @@ export async function getOwnerProperties(req: AuthRequest, res: Response, next: 
       },
       orderBy: { createdAt: 'desc' },
     });
-    res.json(successResponse(properties));
+    const cleanedProperties = properties.map((p) => {
+      let images = p.images;
+      if ((!images || images.length === 0) && Array.isArray(p.amenities)) {
+        const primaryTag = p.amenities.find((a) => a.startsWith('[IMG_PRIMARY:') && a.endsWith(']'));
+        if (primaryTag) {
+          const b64 = primaryTag.slice('[IMG_PRIMARY:'.length, -1);
+          if (b64.startsWith('data:image/')) {
+            images = [{ id: `b64_${p.id}`, propertyId: p.id, imageUrl: b64, publicId: '', isPrimary: true, displayOrder: 0, createdAt: p.createdAt } as any];
+          }
+        }
+      }
+      const cleanAmenities = Array.isArray(p.amenities)
+        ? p.amenities.filter((a) => !a.startsWith('[IMG_PRIMARY:') && !a.startsWith('[IMG_EXTRA:') && !a.startsWith('data:image/'))
+        : [];
+      return {
+        ...p,
+        images,
+        amenities: cleanAmenities,
+      };
+    });
+    res.json(successResponse(cleanedProperties));
   } catch (error) {
     next(error);
   }

@@ -24,6 +24,11 @@ export function usePostLoginNotifications() {
     // Only for roles that have backend push notification support
     if (user.role !== 'OWNER' && user.role !== 'ADMIN') return;
 
+    // If notifications are blocked or already denied by user, skip silently
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'denied') {
+      return;
+    }
+
     // Already registered in this session?
     const storageKey = `vv_push_registered_${user.id}`;
     if (localStorage.getItem(storageKey) === 'true') return;
@@ -51,3 +56,4 @@ export function usePostLoginNotifications() {
     return () => clearTimeout(timer);
   }, [isAuthenticated, user]);
 }
+

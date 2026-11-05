@@ -2,6 +2,23 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database';
 import { getFirebaseMessaging } from '../config/firebase';
 
+const inFlightPushLocks = new Map<string, number>();
+
+function isPushLocked(key: string): boolean {
+  const lastTime = inFlightPushLocks.get(key);
+  if (lastTime && Date.now() - lastTime < 60000) {
+    return true;
+  }
+  inFlightPushLocks.set(key, Date.now());
+  if (inFlightPushLocks.size > 200) {
+    const cutoff = Date.now() - 120000;
+    for (const [k, v] of inFlightPushLocks.entries()) {
+      if (v < cutoff) inFlightPushLocks.delete(k);
+    }
+  }
+  return false;
+}
+
 interface PropertyRef {
   id: string;
   ownerId: string;
@@ -26,6 +43,11 @@ export async function sendOwnerPushNotification({
   href: string;
 }): Promise<void> {
   if (propertyId) {
+    const lockKey = `${ownerId}_${propertyId}_${title}`;
+    if (isPushLocked(lockKey)) {
+      console.info(`[Notifications] Suppressed concurrent push alert for ${lockKey}`);
+      return;
+    }
     const recentExisting = await prisma.ownerNotification.findFirst({
       where: {
         ownerId,
@@ -35,7 +57,6 @@ export async function sendOwnerPushNotification({
       },
     });
     if (recentExisting) {
-      // Avoid duplicate alert within 10 minutes
       return;
     }
   }
@@ -67,13 +88,16 @@ export async function sendOwnerPushNotification({
   });
   if (subscriptions.length === 0) return;
 
+  const uniqueTokens = Array.from(new Set(subscriptions.map(({ token }) => token).filter(Boolean)));
+  if (uniqueTokens.length === 0) return;
+
   const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}${href}`;
   const logoUrl = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/logo-emblem.png`;
   const notificationTag = propertyId ? `property_${propertyId}` : (notification?.id || 'veedu_alert');
 
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
-      tokens: subscriptions.map(({ token }) => token),
+      tokens: uniqueTokens,
       notification: {
         title,
         body,
@@ -296,13 +320,16 @@ export async function notifyPropertyView(
   });
   if (subscriptions.length === 0) return;
 
+  const uniqueTokens = Array.from(new Set(subscriptions.map(({ token }) => token).filter(Boolean)));
+  if (uniqueTokens.length === 0) return;
+
   const targetLink = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/owner/properties`;
   const logoUrl = `${process.env.FRONTEND_URL?.split(',')[0]?.trim() || 'https://www.veeduvadagaikkuchennai.com'}/logo-emblem.png`;
   const viewTag = `view_${property.id}_${visitorKey}`;
 
   try {
     const result = await getFirebaseMessaging().sendEachForMulticast({
-      tokens: subscriptions.map(({ token }) => token),
+      tokens: uniqueTokens,
       notification: {
         title: notification.title,
         body: notification.body,

@@ -57,6 +57,18 @@ export async function registerOwnerPushToken(req: AuthRequest, res: Response, ne
       create: { ownerId, token },
       update: { ownerId, updatedAt: new Date() },
     });
+    // Keep at most 3 latest active tokens per owner to prevent duplicate push blast
+    const allTokens = await prisma.notificationPushToken.findMany({
+      where: { ownerId },
+      orderBy: { updatedAt: 'desc' },
+      select: { id: true },
+    });
+    if (allTokens.length > 3) {
+      const idsToDelete = allTokens.slice(3).map((t) => t.id);
+      await prisma.notificationPushToken.deleteMany({
+        where: { id: { in: idsToDelete } },
+      });
+    }
     res.json(successResponse(null, 'Browser notifications enabled'));
   } catch (error) {
     next(error);

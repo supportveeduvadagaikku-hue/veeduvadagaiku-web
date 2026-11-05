@@ -136,6 +136,8 @@ model Property {
 
   @@index([status, expiresAt])
   @@index([expiresAt])
+  @@index([status, createdAt])
+  @@index([status, propertyType, createdAt])
 }
 
 model PropertyImage {
