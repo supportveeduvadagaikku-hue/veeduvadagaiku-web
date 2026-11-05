@@ -63,10 +63,11 @@ export const DeepavaliPromotionalPopup: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg bg-gradient-to-b from-[#1b0610] via-[#240a15] to-[#2d0c1b] text-white rounded-3xl p-6 sm:p-8 border-2 border-[#f59e0b] shadow-2xl shadow-amber-950/40 overflow-hidden animate-scale-up"
+        className="relative w-full max-w-lg bg-gradient-to-br from-[#7D4D2B] via-[#9E6941] to-[#6E3F1F] text-white rounded-3xl p-6 sm:p-8 border-2 border-[#D4A373] shadow-2xl shadow-amber-950/40 overflow-hidden animate-scale-up"
       >
-        {/* Festive background accents */}
-        <div className="absolute -top-16 -right-16 w-44 h-44 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full blur-2xl pointer-events-none" />
+        {/* Festive background shine accents */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-200/25 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-44 h-44 bg-gradient-to-br from-amber-400/25 to-orange-500/20 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-gradient-to-tr from-rose-500/20 to-amber-400/20 rounded-full blur-2xl pointer-events-none" />
 
         {/* Close Button */}
@@ -74,15 +75,15 @@ export const DeepavaliPromotionalPopup: React.FC = () => {
           onClick={handleDismiss}
           type="button"
           aria-label="Close promotional offer popup"
-          className="absolute top-4 right-4 p-2 rounded-full text-[#edd8de] hover:text-white hover:bg-white/10 transition-colors z-10"
+          className="absolute top-4 right-4 p-2 rounded-full text-[#FDECD2] hover:text-white hover:bg-white/10 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="relative space-y-5 text-center">
           {/* Festive Badge */}
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#391121] border border-[#5a1b34] text-[#fcd34d] font-black text-xs uppercase tracking-wider shadow-md">
-            <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#5A3319]/80 border border-[#D4A373]/50 text-[#FFE4A0] font-black text-xs uppercase tracking-wider shadow-md">
+            <Flame className="w-3.5 h-3.5 text-[#FBBF24]" />
             <span>DEEPAVALI SPECIAL OFFER</span>
           </div>
 
@@ -145,9 +146,9 @@ export const DeepavaliPromotionalPopup: React.FC = () => {
             <button
               type="button"
               onClick={handleAction}
-              className="w-full py-3.5 px-6 rounded-full bg-[#f59e0b] hover:bg-[#eab308] active:scale-[0.98] text-[#1b0610] font-black text-sm sm:text-base shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 group"
+              className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#D97706] hover:brightness-105 active:scale-[0.98] text-[#3D2211] font-black text-sm sm:text-base shadow-xl shadow-amber-950/25 transition-all flex items-center justify-center gap-2 group"
             >
-              <Sparkles className="w-4 h-4 text-[#1b0610]" />
+              <Sparkles className="w-4 h-4 text-[#3D2211]" />
               <span>Post your property for free</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>

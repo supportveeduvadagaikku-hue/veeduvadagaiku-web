@@ -30,6 +30,7 @@ export const ManagePlansPage: React.FC = () => {
   const [price, setPrice] = useState('0');
   const [strikePrice, setStrikePrice] = useState('');
   const [durationDays, setDurationDays] = useState('60');
+  const [listingCount, setListingCount] = useState('1');
   const [description, setDescription] = useState('');
   const [featuresStr, setFeaturesStr] = useState('');
   const [ctaLabel, setCtaLabel] = useState('');
@@ -57,6 +58,7 @@ export const ManagePlansPage: React.FC = () => {
     setPrice('99');
     setStrikePrice('');
     setDurationDays('60');
+    setListingCount('1');
     setDescription('');
     setFeaturesStr('Listed in All Chennai Pincodes\nDirect Phone & WhatsApp Leads\n60-Day Listing Validity\nAll Property Categories\nUp to 10 HD Photos');
     setCtaLabel('Subscribe');
@@ -77,6 +79,7 @@ export const ManagePlansPage: React.FC = () => {
     setPrice(String(plan.price));
     setStrikePrice(plan.strikePrice || '');
     setDurationDays(String(plan.durationDays));
+    setListingCount(String(plan.listingCount ?? 1));
     setDescription(plan.description || '');
     setFeaturesStr(plan.features?.join('\n') || '');
     setCtaLabel(plan.ctaLabel || '');
@@ -98,6 +101,7 @@ export const ManagePlansPage: React.FC = () => {
         price: parseFloat(price) || 0,
         strikePrice: strikePrice.trim() || null,
         durationDays: parseInt(durationDays) || 60,
+        listingCount: parseInt(listingCount) || 1,
         description: description.trim(),
         ctaLabel: ctaLabel.trim() || null,
         ctaLink: ctaLink.trim() || null,
@@ -167,18 +171,19 @@ export const ManagePlansPage: React.FC = () => {
       <SEOHead title="Manage Listing Plans | Veedu Vadagaikku Chennai Admin" />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#1b0610] via-[#240a15] to-[#2d0c1b] rounded-3xl p-6 sm:p-8 text-white border border-[#3d1323] shadow-xl">
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#7D4D2B] via-[#9E6941] to-[#6E3F1F] rounded-3xl p-6 sm:p-8 text-white border border-[#D4A373]/50 shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-200/25 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#391121] border border-[#5a1b34] text-[#fcd34d] text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-[#f59e0b]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5A3319]/80 border border-[#D4A373]/50 text-[#FFE4A0] text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
               <span>Owner Advertising Pricing &amp; Festive Showcase</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-xs">
               Manage Owner Plans &amp; Pricing
             </h1>
-            <p className="text-xs sm:text-sm text-[#edd8de] max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#FDECD2] max-w-2xl leading-relaxed">
               Every plan configured here directly controls the owner advertising cards and pricing shown on the homepage and plans page. Edit prices, Tamil titles, badges, and included features in real-time.
             </p>
           </div>
@@ -187,7 +192,7 @@ export const ManagePlansPage: React.FC = () => {
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#f59e0b] hover:bg-[#eab308] text-[#1b0610] font-black text-xs sm:text-sm shadow-xl shadow-amber-500/20 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#D97706] hover:brightness-105 text-[#3D2211] font-black text-xs sm:text-sm shadow-xl shadow-amber-950/25 transition-all active:scale-95"
             >
               <PlusCircle className="w-4 h-4" />
               <span>+ Create New Plan</span>
@@ -204,7 +209,7 @@ export const ManagePlansPage: React.FC = () => {
             onClick={() => setFilterTab('ACTIVE')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
               filterTab === 'ACTIVE'
-                ? 'bg-[#240a15] text-[#f59e0b] shadow-xs'
+                ? 'bg-gradient-to-r from-[#7D4D2B] to-[#5A3319] text-[#FFE4A0] shadow-xs'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -215,7 +220,7 @@ export const ManagePlansPage: React.FC = () => {
             onClick={() => setFilterTab('ALL')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
               filterTab === 'ALL'
-                ? 'bg-[#240a15] text-[#f59e0b] shadow-xs'
+                ? 'bg-gradient-to-r from-[#7D4D2B] to-[#5A3319] text-[#FFE4A0] shadow-xs'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -241,7 +246,7 @@ export const ManagePlansPage: React.FC = () => {
                 key={plan.id}
                 className={`rounded-3xl p-6 sm:p-7 border-2 shadow-sm flex flex-col justify-between space-y-5 transition-all relative overflow-hidden
                   ${isPremiumHall
-                    ? 'bg-[#240a15] text-white border-[#f59e0b] shadow-xl'
+                    ? 'bg-gradient-to-b from-[#6E3F1F] via-[#7D4D2B] to-[#5A3319] text-white border-2 border-[#F59E0B] shadow-xl'
                     : isFreeOffer
                     ? 'bg-gradient-to-b from-[#fffbeb] to-white border-amber-300 shadow-md'
                     : 'bg-white text-gray-900 border-gray-200'
@@ -253,10 +258,10 @@ export const ManagePlansPage: React.FC = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-2xs ${
                       isFreeOffer
-                        ? 'bg-[#f59e0b] text-[#1b0610]'
+                        ? 'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#3D2211]'
                         : isPremiumHall
-                        ? 'bg-[#391121] text-[#f59e0b] border border-[#5a1b34]'
-                        : 'bg-amber-50 text-[#92400e] border border-amber-200'
+                        ? 'bg-[#5A3319] text-[#FFE4A0] border border-[#D4A373]'
+                        : 'bg-amber-50 text-[#7D4D2B] border border-amber-200'
                     }`}
                   >
                     {plan.badge || (isFreeOffer ? 'DEEPAVALI OFFER' : isPremiumHall ? 'PREMIUM VENUE' : plan.name.toUpperCase())}
@@ -304,7 +309,7 @@ export const ManagePlansPage: React.FC = () => {
                       ₹{plan.price.toLocaleString('en-IN')}
                     </span>
                     <span className={`text-xs font-semibold ${isPremiumHall ? 'text-[#edd8de]' : 'text-gray-500'}`}>
-                      / {plan.durationDays} days
+                      / {plan.durationDays} days · {plan.listingCount ?? 1} listing{(plan.listingCount ?? 1) === 1 ? '' : 's'}
                     </span>
                   </div>
 
@@ -356,7 +361,7 @@ export const ManagePlansPage: React.FC = () => {
                       onClick={() => openEdit(plan)}
                       className={`px-3 py-1.5 text-xs font-bold rounded-xl transition flex items-center gap-1.5 ${
                         isPremiumHall
-                          ? 'bg-[#391121] text-[#fcd34d] hover:bg-[#48162a]'
+                          ? 'bg-[#5A3319] text-[#FFE4A0] hover:bg-[#6E3F1F]'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -483,7 +488,7 @@ export const ManagePlansPage: React.FC = () => {
               </div>
 
               {/* Price, Duration, Sort Order */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                     Price (₹) *
@@ -510,6 +515,21 @@ export const ManagePlansPage: React.FC = () => {
                     placeholder="60"
                     value={durationDays}
                     onChange={(e) => setDurationDays(e.target.value)}
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#f59e0b]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Property Listings *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    placeholder="1"
+                    value={listingCount}
+                    onChange={(e) => setListingCount(e.target.value)}
                     className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#f59e0b]"
                   />
                 </div>
@@ -572,7 +592,7 @@ export const ManagePlansPage: React.FC = () => {
                     onChange={(e) => setEnabledCount(parseInt(e.target.value) || 5)}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#f59e0b]"
                   />
-                  <span className="w-10 text-center font-black text-sm text-[#240a15] bg-amber-100 py-1 rounded-md">
+                  <span className="w-10 text-center font-black text-sm text-[#4D270E] bg-amber-100 py-1 rounded-md">
                     {enabledCount}/8
                   </span>
                 </div>
@@ -660,7 +680,7 @@ export const ManagePlansPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="px-6 py-2.5 bg-[#240a15] hover:bg-[#320e1e] text-[#f59e0b] font-black text-xs rounded-xl shadow-md transition disabled:opacity-50"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#7D4D2B] via-[#9E6941] to-[#7D4D2B] hover:brightness-110 text-white font-black text-xs rounded-xl shadow-md transition disabled:opacity-50 border border-[#D4A373]/40"
                 >
                   {saveMutation.isPending ? 'Saving...' : 'Save Plan & Update Live'}
                 </button>

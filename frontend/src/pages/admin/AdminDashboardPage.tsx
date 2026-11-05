@@ -31,15 +31,15 @@ const DeepavaliStatCard: React.FC<StatCardProps> = ({
 }) => {
   const styles = {
     gold: {
-      card: 'bg-gradient-to-br from-[#240a15] to-[#391121] border-[#f59e0b]/30',
+      card: 'bg-gradient-to-br from-[#7D4D2B] to-[#5A3319] border-[#D4A373]/50',
       title: 'text-[#fde68a]',
-      value: 'text-[#f59e0b]',
-      sub: 'text-[#edd8de]',
+      value: 'text-[#FFE4A0]',
+      sub: 'text-[#FDECD2]',
     },
     wine: {
       card: 'bg-white border-[#e8d5cb]',
       title: 'text-gray-500',
-      value: 'text-[#240a15]',
+      value: 'text-[#7D4D2B]',
       sub: 'text-gray-500',
     },
     emerald: {
@@ -100,30 +100,31 @@ export const AdminDashboardPage: React.FC = () => {
       <SEOHead title="Admin Dashboard | Veedu Vadagaikku Chennai" />
 
       {/* ── DEEPAVALI FESTIVE HEADER BANNER ── */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#1b0610] via-[#240a15] to-[#2d0c1b] rounded-3xl p-6 sm:p-8 text-white shadow-2xl border border-[#3d1323]">
-        <div className="absolute top-0 left-1/3 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-64 h-64 bg-rose-700/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#7D4D2B] via-[#9E6941] to-[#6E3F1F] rounded-3xl p-6 sm:p-8 text-white shadow-2xl border border-[#D4A373]/50">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-200/25 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-1/3 w-72 h-72 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f59e0b]/15 border border-[#f59e0b]/30 text-[#fcd34d] text-[11px] font-bold uppercase tracking-widest">
-              <Flame className="w-3 h-3 text-[#f59e0b]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5A3319]/80 border border-[#D4A373]/50 text-[#FFE4A0] text-[11px] font-bold uppercase tracking-widest">
+              <Flame className="w-3 h-3 text-[#FBBF24]" />
               <span>Deepavali 2026 Live Offer Dashboard</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-xs">
               Platform Analytics &amp;{' '}
-              <span className="text-[#f59e0b]">Control Centre</span>
+              <span className="text-[#FFE4A0]">Control Centre</span>
             </h1>
-            <p className="text-xs sm:text-sm text-[#d4bac6] max-w-lg">
+            <p className="text-xs sm:text-sm text-[#FDECD2] max-w-lg">
               Supervise active listings, review paid ads, and monitor platform revenue. Deepavali
               Free offer active until{' '}
-              <span className="text-[#fcd34d] font-bold">8 Nov 2026</span>.
+              <span className="text-[#FFE4A0] font-bold">8 Nov 2026</span>.
             </p>
           </div>
           <div className="flex flex-col gap-2 shrink-0">
             {pendingApprovalsCount > 0 && (
               <Link
                 to="/admin/pending"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f59e0b] hover:bg-[#eab308] text-[#1b0610] font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-500/30 transition animate-pulse"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#D97706] hover:brightness-105 text-[#3D2211] font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950/25 transition animate-pulse"
               >
                 <Clock className="w-4 h-4" />
                 <span>{pendingApprovalsCount} Listings Awaiting Review</span>
@@ -133,7 +134,7 @@ export const AdminDashboardPage: React.FC = () => {
             <Link
               to="/plans"
               target="_blank"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#391121] hover:bg-[#4a162c] text-[#f59e0b] border border-[#f59e0b]/30 font-bold text-xs rounded-xl transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#5A3319] hover:bg-[#6E3F1F] text-[#FFE4A0] border border-[#D4A373]/50 font-bold text-xs rounded-xl transition shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>View Live Deepavali Offer Page</span>
@@ -181,10 +182,10 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-3xl p-6 border border-[#e8d5cb] shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#f0e6dc]">
             <div>
-              <h3 className="font-extrabold text-base text-[#240a15]">Recent Property Submissions</h3>
+              <h3 className="font-extrabold text-base text-[#4D270E]">Recent Property Submissions</h3>
               <p className="text-[11px] text-gray-500 mt-0.5">Latest listings pending review or published</p>
             </div>
-            <Link to="/admin/properties" className="text-xs font-bold text-[#8b263e] hover:text-[#240a15] flex items-center gap-1 transition">
+            <Link to="/admin/properties" className="text-xs font-bold text-[#8b263e] hover:text-[#4D270E] flex items-center gap-1 transition">
               View All <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -193,7 +194,7 @@ export const AdminDashboardPage: React.FC = () => {
               stats.recentProperties.map((prop) => (
                 <div key={prop.id} className="p-3.5 bg-[#faf6ef] rounded-2xl flex items-center justify-between text-xs border border-[#f0e4d4]/60 hover:border-[#e8d5cb] transition">
                   <div className="min-w-0">
-                    <h4 className="font-bold text-[#240a15] truncate max-w-xs">{prop.title}</h4>
+                    <h4 className="font-bold text-[#4D270E] truncate max-w-xs">{prop.title}</h4>
                     <p className="text-gray-500 mt-0.5">{prop.locality}, Chennai • ₹{prop.rent.toLocaleString('en-IN')}/mo</p>
                   </div>
                   <span className={`font-bold px-2.5 py-1 rounded-full text-[10px] shrink-0 ml-2 border ${prop.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : prop.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
@@ -211,10 +212,10 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-3xl p-6 border border-[#e8d5cb] shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#f0e6dc]">
             <div>
-              <h3 className="font-extrabold text-base text-[#240a15]">Recent Gateway Transactions</h3>
+              <h3 className="font-extrabold text-base text-[#4D270E]">Recent Gateway Transactions</h3>
               <p className="text-[11px] text-gray-500 mt-0.5">Latest payment gateway activity</p>
             </div>
-            <Link to="/admin/payments" className="text-xs font-bold text-[#8b263e] hover:text-[#240a15] flex items-center gap-1 transition">
+            <Link to="/admin/payments" className="text-xs font-bold text-[#8b263e] hover:text-[#4D270E] flex items-center gap-1 transition">
               View All <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -223,7 +224,7 @@ export const AdminDashboardPage: React.FC = () => {
               stats.recentPayments.map((pay) => (
                 <div key={pay.id} className="p-3.5 bg-[#faf6ef] rounded-2xl flex items-center justify-between text-xs border border-[#f0e4d4]/60 hover:border-[#e8d5cb] transition">
                   <div className="min-w-0">
-                    <h4 className="font-bold text-[#240a15]">{pay.plan?.name} Plan</h4>
+                    <h4 className="font-bold text-[#4D270E]">{pay.plan?.name} Plan</h4>
                     <p className="text-gray-500 truncate max-w-xs mt-0.5">{pay.property?.title}</p>
                   </div>
                   <div className="text-right shrink-0 ml-2">
@@ -254,10 +255,10 @@ export const AdminDashboardPage: React.FC = () => {
             to={item.to}
             className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-[#e8d5cb] hover:border-[#f59e0b]/50 hover:shadow-md hover:-translate-y-0.5 transition-all group"
           >
-            <div className="p-2 rounded-xl bg-[#240a15]/5 group-hover:bg-[#f59e0b]/15 transition">
-              <item.icon className="w-4 h-4 text-[#240a15] group-hover:text-[#92400e]" />
+            <div className="p-2 rounded-xl bg-[#7D4D2B]/10 group-hover:bg-[#f59e0b]/15 transition">
+              <item.icon className="w-4 h-4 text-[#7D4D2B] group-hover:text-[#92400e]" />
             </div>
-            <span className="text-xs font-bold text-[#240a15] group-hover:text-[#8b263e] transition">{item.label}</span>
+            <span className="text-xs font-bold text-[#4D270E] group-hover:text-[#7D4D2B] transition">{item.label}</span>
             <ArrowRight className="w-3.5 h-3.5 text-gray-400 ml-auto group-hover:text-[#f59e0b] group-hover:translate-x-0.5 transition-all" />
           </Link>
         ))}

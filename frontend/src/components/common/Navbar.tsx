@@ -54,9 +54,9 @@ export const Navbar: React.FC = () => {
             </Link>
             <Link
               to="/plans"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#240a15] to-[#391121] text-[#f59e0b] border border-[#f59e0b]/50 text-xs font-bold hover:brightness-110 hover:scale-[1.02] transition-all shadow-xs whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#7D4D2B] via-[#9E6941] to-[#6E3F1F] text-[#FFE4A0] border border-[#D4A373]/60 text-xs font-bold hover:brightness-110 hover:scale-[1.02] transition-all shadow-sm whitespace-nowrap"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#f59e0b]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
               <span>Listing Plans</span>
             </Link>
 
@@ -293,7 +293,7 @@ export const Navbar: React.FC = () => {
           <Link
             to="/plans"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-3.5 py-3 text-sm font-bold text-[#240a15] hover:bg-[#FAF6ED] rounded-xl bg-[#fff5e6] border border-[#fde2b8]"
+            className="flex items-center gap-3 px-3.5 py-3 text-sm font-bold text-[#4D270E] hover:bg-[#FAF6ED] rounded-xl bg-[#fff5e6] border border-[#fde2b8]"
           >
             <Sparkles className="w-4 h-4 text-[#f59e0b]" />
             <span>Listing Plans</span>

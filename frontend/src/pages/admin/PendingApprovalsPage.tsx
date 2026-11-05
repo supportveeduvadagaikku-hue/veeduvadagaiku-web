@@ -109,7 +109,7 @@ const AdminPropertyImagesViewer: React.FC<AdminPropertyImagesViewerProps> = ({
       {/* Main Image Container with Ambient Backdrop & Contain */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-[#1b0610] via-[#240a15] to-[#12040b] border border-amber-900/40 shadow-sm cursor-zoom-in group flex items-center justify-center"
+        className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-[#7D4D2B] via-[#9E6941] to-[#6E3F1F] border border-amber-900/40 shadow-sm cursor-zoom-in group flex items-center justify-center"
         title="Click to view full photo"
       >
         {/* Ambient Blur */}

@@ -34,7 +34,7 @@ export const ListingPlansPage: React.FC = () => {
               <RazorpayCheckoutButton
                 amount={100}
                 description="Razorpay Checkout Test"
-                className="px-5 py-2.5 bg-[#240a15] hover:bg-[#391121] text-[#f59e0b] font-bold text-xs rounded-full shadow-sm active:scale-95 transition"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#7D4D2B] via-[#9E6941] to-[#7D4D2B] hover:brightness-110 text-white font-bold text-xs rounded-full shadow-sm active:scale-95 transition border border-[#D4A373]/40"
               >
                 Test Razorpay Modal (₹1)
               </RazorpayCheckoutButton>
